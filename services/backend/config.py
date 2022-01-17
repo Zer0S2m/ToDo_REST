@@ -1,0 +1,3 @@
+BD_NAME = "db_todo"
+LIMIT_TITLE = 255
+LIMIT_TEXT = 1000

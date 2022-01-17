@@ -2,3 +2,10 @@ node_modules/
 /dist/
 env/
 __pycache__
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+db_todo.db
