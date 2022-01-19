@@ -17,8 +17,8 @@ from config import (
 )
 
 
-engine = create_async_engine(f"sqlite+aiosqlite:///{BD_NAME}.db")
-session = sessionmaker(
+engine = create_async_engine(f"sqlite+aiosqlite:///db/{BD_NAME}.db")
+Session = sessionmaker(
     engine, expire_on_commit = False, class_ = AsyncSession
 )
 Base = declarative_base()

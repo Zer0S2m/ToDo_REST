@@ -1,5 +1,5 @@
-from models import Base
-from models import engine
+from models.models import Base
+from models.models import engine
 
 
 if __name__ == '__main__':
