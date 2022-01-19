@@ -77,7 +77,7 @@ async def get_note(note_id: int):
     if not note:
         return HTTPException(status_code = 404, detail = "Note not found")
 
-    return {"note": note}
+    return note
 
 
 def get_pub_date_note(date: datetime) -> str:

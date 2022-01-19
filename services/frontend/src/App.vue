@@ -1,6 +1,9 @@
 <template>
 	<div id="app">
-		<router-view/>
+		<div class="container text-start w-50">
+			<h1 class="text-center mb-5">ToDo FastAPI/Python & VueJS</h1>
+			<router-view/>
+		</div>
 	</div>
 </template>
 
@@ -13,10 +16,6 @@ export default {
 <style>
 #app {
 	font-family: 'Avenir', Helvetica, Arial, sans-serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	text-align: center;
-	color: #2c3e50;
-	margin-top: 60px;
+	padding: 60px 0;
 }
 </style>

@@ -1,39 +1,50 @@
 <template>
-	<div>
-		<h1>{{ msg }}</h1>
+	<div class="list-group">
+		<NoteItem
+			v-for="(noteKey, index) in keysNotes" v-bind:key="index"
+			v-bind:id="index"
+			v-bind:title="notes[noteKey].title"
+			v-bind:text="notes[noteKey].text"
+			v-bind:pubDate="notes[noteKey].pub_date"
+		>
+		</NoteItem>
 	</div>
 </template>
 
 <script>
 import axios from 'axios';
+import NoteItem from "./NoteItem"
+
 
 export default {
 	name: 'Index',
+	components: {
+		NoteItem
+	},
 	data() {
 		return {
-			msg: '',
+			notes: '',
+			keysNotes: []
 		};
 	},
 	methods: {
-		getMessage() {
+		getNotes() {
 			axios.get("/")
 				.then((res) => {
-					this.msg = res.data;
-					console.log(this.msg);
-				})
+					this.notes = res.data;
+					this.keysNotes = Object.keys(this.notes);
+				})	
 				.catch((error) => {
 					console.error(error);
 				});
 		},
 	},
 	created() {
-		this.getMessage();
+		this.getNotes();
 	},
 }
 </script>
 
 <style scoped>
-h1, h2 {
-	font-weight: normal;
-}
+
 </style>
