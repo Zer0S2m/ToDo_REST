@@ -2,10 +2,10 @@
 	<div class="list-group">
 		<NoteItem
 			v-for="(noteKey, index) in keysNotes" v-bind:key="index"
-			v-bind:id="index"
+			v-bind:id="index + 1"
 			v-bind:title="notes[noteKey].title"
 			v-bind:text="notes[noteKey].text"
-			v-bind:pubDate="notes[noteKey].pub_date"
+			v-bind:pubDate="notes[noteKey].pubDate"
 		>
 		</NoteItem>
 	</div>
