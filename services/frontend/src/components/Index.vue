@@ -3,8 +3,8 @@
 		<NoteItem
 			v-for="(noteKey, index) in keysNotes" v-bind:key="index"
 			v-bind:id="index + 1"
-			v-bind:title="notes[noteKey].title"
-			v-bind:text="notes[noteKey].text"
+			v-bind:title="notes[noteKey].titleNote"
+			v-bind:text="notes[noteKey].textNote"
 			v-bind:pubDate="notes[noteKey].pubDate"
 		>
 		</NoteItem>

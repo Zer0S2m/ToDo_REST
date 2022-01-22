@@ -2,9 +2,9 @@
 	<div class="card">
 		<h5 class="card-header">Note</h5>
 		<div class="card-body">
-			<h5 class="card-title">{{ note.title }}</h5>
+			<h5 class="card-title">{{ note.titleNote }}</h5>
 			<p class="card-text">
-				{{ note.text }}
+				{{ note.textNote }}
 			</p>
 			<button type="button" class="btn btn-primary">Edit</button>
 			<button @click="deleteNote" type="button" class="btn btn-danger">Delete</button>
@@ -31,6 +31,7 @@ export default {
 			axios.get(`/note/${this.$route.params.id}`)
 				.then((res) => {
 					this.note = res.data;
+					console.log(this.note);
 				})
 				.catch((error) => {
 					console.error(error);

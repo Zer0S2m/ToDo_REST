@@ -16,7 +16,7 @@ const routes = [
 		component: Index
 	},
 	{
-		path: '/note/:id/',
+		path: '/note/:id',
 		name: 'NoteDetail',
 		component: NoteDetail,
 	}
