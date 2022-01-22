@@ -11,6 +11,7 @@ from models import Note
 from models import Session
 
 from schemas import NoteSchema
+from schemas import NoteDeleted
 
 
 app = FastAPI()
@@ -33,16 +34,16 @@ async def index():
         for note in notes.scalars():
             pub_date_note = get_pub_date_note(date = note.pub_date)
 
-            notes_json[str(note.id)] = {
-                "title": note.title,
-                "text": note.text,
-                "pub_date": pub_date_note
-            }
+            notes_json[str(note.id)] = NoteSchema(
+                title = note.title,
+                text = note.text
+            )
+            notes_json[str(note.id)].pub_date = pub_date_note
 
     return notes_json
 
 
-@app.post("/note/create/", response_model = NoteSchema)
+@app.post("/note/create", response_model = NoteSchema)
 async def create_note(note: NoteSchema):
     async with Session.begin() as session:
         new_note = Note(
@@ -56,7 +57,20 @@ async def create_note(note: NoteSchema):
     return note
 
 
-@app.get("/note/{note_id:int}/")
+@app.post("/note/delete")
+async def delete_note(note: NoteDeleted):
+    async with Session() as session:
+        result = await session.execute(
+            select(Note).filter_by(id = note.note_id)
+        )
+
+        deleted_note = result.scalars().first()
+
+        await session.delete(deleted_note)
+        await session.commit()
+
+
+@app.get("/note/{note_id:int}")
 async def get_note(note_id: int):
     async with Session() as session:
         note = False
@@ -65,14 +79,14 @@ async def get_note(note_id: int):
             select(Note).filter_by(id = note_id)
         )
 
-        for note in result.scalars():
-            pub_date_note = get_pub_date_note(date = note.pub_date)
+        for note_res in result.scalars():
+            pub_date_note = get_pub_date_note(date = note_res.pub_date)
 
-            note = {
-                "title": note.title,
-                "text": note.text,
-                "pub_date": pub_date_note,
-            }
+            note = NoteSchema(
+                title = note_res.title,
+                text = note_res.text
+            )
+            note.pub_date = pub_date_note
 
     if not note:
         return HTTPException(status_code = 404, detail = "Note not found")
