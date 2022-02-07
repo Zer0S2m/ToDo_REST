@@ -46,7 +46,6 @@ export default {
 			this.$store.commit("setShowModalForm", false);
 		},
 		createNote() {
-
 			if ( !this.textNote ) {
 				return;
 			};
@@ -58,7 +57,10 @@ export default {
 				textNote: this.textNote,
 			})
 			.then((res) => {
-				this.note = res.data;
+				const note = res.data;
+				this.$store.commit("addNote", note);
+
+				this.redirectToNote(note.idNote);
 			})	
 			.catch((error) => {
 				console.log(error);
@@ -66,14 +68,12 @@ export default {
 
 			this.titleNote = "";
 			this.textNote = "";
-			console.log(this.note);
-			// this.redirectToNote();	
 		},
-		redirectToNote() {
+		redirectToNote(idNote) {
 			this.$router.push({
 				name: "NoteDetail",
 				params: {
-					id: this.note.noteId
+					id: idNote
 				},
 			});
 		},

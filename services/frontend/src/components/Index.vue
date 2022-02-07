@@ -1,18 +1,17 @@
 <template>
 	<div class="list-group">
 		<NoteItem
-			v-for="(noteKey, index) in keysNotes" v-bind:key="index"
-			v-bind:id="index + 1"
-			v-bind:title="notes[noteKey].titleNote"
-			v-bind:text="notes[noteKey].textNote"
-			v-bind:pubDate="notes[noteKey].pubDate"
+			v-for="note in Object.keys(notes)" v-bind:key="note"
+			v-bind:id="notes[note].idNote"
+			v-bind:title="notes[note].titleNote"
+			v-bind:text="notes[note].textNote"
+			v-bind:pubDate="notes[note].pubDate"
 		>
 		</NoteItem>
 	</div>
 </template>
 
 <script>
-import axios from 'axios';
 import NoteItem from "./NoteItem"
 
 
@@ -23,24 +22,14 @@ export default {
 	},
 	data() {
 		return {
-			notes: '',
-			keysNotes: []
+			notes: this.$store.state.notes,
 		};
 	},
 	methods: {
-		getNotes() {
-			axios.get("/")
-				.then((res) => {
-					this.notes = res.data;
-					this.keysNotes = Object.keys(this.notes);
-				})	
-				.catch((error) => {
-					console.error(error);
-				});
-		},
+
 	},
 	created() {
-		this.getNotes();
+
 	},
 }
 </script>

@@ -31,7 +31,6 @@ export default {
 			axios.get(`/note/${this.$route.params.id}`)
 				.then((res) => {
 					this.note = res.data;
-					console.log(this.note);
 				})
 				.catch((error) => {
 					console.error(error);
@@ -41,6 +40,7 @@ export default {
 			axios.post(`note/delete`,{
 				noteId: this.$route.params.id
 			})
+			this.$store.commit("deleteNote", this.$route.params.id)
 			this.$router.push({
 				name: "Index"
 			});
