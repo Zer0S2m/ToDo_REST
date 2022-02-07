@@ -35,10 +35,11 @@ async def index():
             pub_date_note = get_pub_date_note(date = note.pub_date)
 
             notes_json[str(note.id)] = NoteSchema()
-            
+
             notes_json[str(note.id)].title = note.title
             notes_json[str(note.id)].text = note.text
             notes_json[str(note.id)].pub_date = pub_date_note
+            notes_json[str(note.id)].id = note.id
 
     return notes_json
 
