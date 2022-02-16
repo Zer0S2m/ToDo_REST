@@ -13,4 +13,10 @@ class NoteSchema(BaseModel):
 
 
 class NoteDeleted(BaseModel):
-    note_id: int = Field(alias = "noteId")
+    id: int = Field(alias = "idNote")
+
+
+class NoteEdit(BaseModel):
+    id: Optional[int] = Field(None, alias = "idNote")
+    title: Optional[str] = Field(None, alias = "titleNote")
+    text: Optional[str] = Field(alias = "textNote")
