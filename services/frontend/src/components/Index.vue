@@ -22,14 +22,8 @@ export default {
 	},
 	data() {
 		return {
-			notes: this.$store.state.notes,
+			notes: this.$store.getters.getNotes,
 		};
-	},
-	methods: {
-
-	},
-	created() {
-
 	},
 }
 </script>

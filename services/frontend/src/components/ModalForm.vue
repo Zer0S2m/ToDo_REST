@@ -1,5 +1,5 @@
 <template>
-	<div v-if="this.$store.state.isShowModalForm" class="modal fade show" id="exampleModal" style="display: block;">
+	<div v-if="this.$store.state.note.isShowModalForm" class="modal fade show" id="exampleModal" style="display: block;">
 		<div class="modal-dialog modal-dialog modal-dialog-centered">
 			<div class="modal-content">
 				<div class="modal-header">

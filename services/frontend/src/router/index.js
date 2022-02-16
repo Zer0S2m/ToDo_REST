@@ -2,7 +2,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 
 import Vue from 'vue'
 import Router from 'vue-router'
-import VueRouter from 'vue-router';
+import VueRouter from 'vue-router'
 import Index from '@/components/Index'
 import NoteDetail from '@/components/NoteDetail'
 
@@ -32,7 +32,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-	if ( !Object.keys(store.state.notes).length ) {
+	if ( !Object.keys(store.state.note.notes).length ) {
 		axios.get("/")
 		.then((res) => {
 			store.dispatch("setNotes", res.data);

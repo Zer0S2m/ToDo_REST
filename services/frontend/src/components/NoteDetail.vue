@@ -16,30 +16,15 @@
 </template>
 
 <script>
-import axios from 'axios';
-
-
 export default {
 	name: "NoteDetail",
 	data() {
 		return {
-			note: false
+			note: {},
 		}
 	},
 	methods: {
-		getNote() {
-			axios.get(`/note/${this.$route.params.id}`)
-				.then((res) => {
-					this.note = res.data;
-				})
-				.catch((error) => {
-					console.error(error);
-				});
-		},
 		deleteNote() {
-			axios.post(`note/delete`,{
-				noteId: this.$route.params.id
-			})
 			this.$store.commit("deleteNote", this.$route.params.id)
 			this.$router.push({
 				name: "Index"
@@ -47,7 +32,7 @@ export default {
 		},
 	},
 	created() {
-		this.getNote();
+		this.note = this.$store.getters.getNote(this.$route.params.id);
 	},
 }
 </script>
