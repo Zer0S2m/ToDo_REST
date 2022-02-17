@@ -10,7 +10,7 @@
 					<span>ToDo</span>
 				</router-link>
 				<div>
-					<button @click="openFormAddNote" type="button" class="btn btn-primary">
+					<button @click="openModal" type="button" class="btn btn-primary">
   					Add note
 					</button>
 				</div>
@@ -20,6 +20,8 @@
 </template>
 
 <script>
+import { mapMutations } from "vuex";
+
 import ModalForm from "./ModalForm";
 
 
@@ -29,8 +31,13 @@ export default {
 		ModalForm
 	},
 	methods: {
-		openFormAddNote() {
-			this.$store.commit("setShowModalForm", true);
+		...mapMutations([
+			"setShowModalForm",
+			"setActionForFormNote"
+		]),
+		openModal() {
+			this.setShowModalForm(true);
+			this.setActionForFormNote("create");
 		},
 	},
 }

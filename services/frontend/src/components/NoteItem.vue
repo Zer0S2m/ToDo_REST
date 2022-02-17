@@ -1,14 +1,14 @@
 <template>
 	<div>
 		<router-link
-			:to="{ name: 'NoteDetail', params: { id: id } }"
+			:to="{ name: 'NoteDetail', params: { id: note.id } }"
 			class="list-group-item list-group-item-action"
 		>
 			<div class="d-flex w-100 justify-content-between">
-				<h5 class="mb-1">{{ title }}</h5>
-				<small>{{ pubDate }}</small>
+				<h5 class="mb-1">{{ note.titleNote }}</h5>
+				<small>{{ note.pubDate }}</small>
 			</div>
-			<p class="mb-1">{{ text }}</p>
+			<p class="mb-1">{{ note.textNote }}</p>
 		</router-link>
 	</div>
 </template>
@@ -17,10 +17,7 @@
 export default {
 	name: "NoteDetail",
 	props: {
-		id: Number,
-		title: String,
-		text: String,
-		pubDate: String
+		note: Object,
 	},
 }
 </script>

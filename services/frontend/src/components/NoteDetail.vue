@@ -6,8 +6,8 @@
 			<p class="card-text">
 				{{ note.textNote }}
 			</p>
-			<button type="button" class="btn btn-primary">Edit</button>
-			<button @click="deleteNote" type="button" class="btn btn-danger">Delete</button>
+			<button @click="editNote" type="button" class="btn btn-primary">Edit</button>
+			<button @click="toDeleteNote" type="button" class="btn btn-danger">Delete</button>
 		</div>
 		<div class="card-footer text-muted">
 			{{ note.pubDate }}
@@ -16,6 +16,13 @@
 </template>
 
 <script>
+import {
+	mapGetters,
+	mapActions,
+	mapMutations
+} from "vuex";
+
+
 export default {
 	name: "NoteDetail",
 	data() {
@@ -24,15 +31,31 @@ export default {
 		}
 	},
 	methods: {
-		deleteNote() {
-			this.$store.commit("deleteNote", this.$route.params.id)
+		...mapActions([
+			"deleteNote"
+		]),
+		...mapMutations([
+			"setActionForFormNote",
+			"setShowModalForm"
+		]),
+		toDeleteNote() {
+			this.deleteNote(this.$route.params.id);
 			this.$router.push({
 				name: "Index"
 			});
 		},
+		editNote() {
+			this.setShowModalForm(true);
+			this.setActionForFormNote("edit");
+		},
+	},
+	computed: {
+		...mapGetters([
+			"getNote"
+		])
 	},
 	created() {
-		this.note = this.$store.getters.getNote(this.$route.params.id);
+		this.note = this.getNote(this.$route.params.id);
 	},
 }
 </script>

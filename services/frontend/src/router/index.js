@@ -32,10 +32,15 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-	if ( !Object.keys(store.state.note.notes).length ) {
+	if ( !store.getters.getNotes.length ) {
 		axios.get("/")
 		.then((res) => {
-			store.dispatch("setNotes", res.data);
+			const values = Object.values(res.data);
+			for ( let i = 0; i < values.length; i++ ) {
+				values[i].id = i;
+			};
+
+			store.dispatch("setNotes", values);
 			next();
 		})
 		.catch((error) => {

@@ -1,4 +1,4 @@
-# ToDO REST
+# ToDo REST
 
 ## Backend
 
