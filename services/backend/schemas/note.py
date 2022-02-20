@@ -1,5 +1,8 @@
 from typing import Optional
+from typing import Union
+
 from datetime import datetime
+from fastapi import File
 
 from pydantic import BaseModel
 from pydantic import Field
@@ -9,7 +12,9 @@ class NoteSchema(BaseModel):
     id: Optional[int] = Field(None, alias = "idNote")
     title: Optional[str] = Field(None, alias = "titleNote")
     text: Optional[str] = Field(alias = "textNote")
-    pub_date: Optional[datetime] = Field(alias = "pubDate", default = datetime.now())
+    pub_date: Union[datetime, str] = Field(alias = "pubDate", default = datetime.now())
+    id_file: Optional[int] = Field(None, alias = "idFile")
+    name_file: Optional[str] = Field(None, alias = "fileName")
 
 
 class NoteDeleted(BaseModel):
@@ -20,3 +25,8 @@ class NoteEdit(BaseModel):
     id: Optional[int] = Field(None, alias = "idNote")
     title: Optional[str] = Field(None, alias = "titleNote")
     text: Optional[str] = Field(alias = "textNote")
+
+
+class FileCreate(BaseModel):
+    id: Optional[int] = Field(None, alias = "idFile")
+    file_name: Optional[str] = Field(None, alias = "fileName")

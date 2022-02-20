@@ -1,2 +1,3 @@
-from models.models import Note
-from models.models import Session
+from models.models import (
+    Note, File, Session
+)

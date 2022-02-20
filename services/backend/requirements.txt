@@ -3,3 +3,5 @@ uvicorn==0.17.0
 SQLAlchemy==1.4.27
 aiosqlite==0.17.0
 pydantic==1.9.0
+python-multipart==0.0.5
+aiofiles==0.8.0
