@@ -75,10 +75,10 @@ export default {
 				responseType: 'arraybuffer'
 			})
       .then((response) => {
-        this.forceFileDownload(response)
+        this.forceFileDownload(response);
       })
       .catch((error) => {
-				console.error(error)
+				console.error(error);
 			});
 		}
 	},

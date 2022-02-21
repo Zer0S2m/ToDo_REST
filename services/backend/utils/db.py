@@ -7,10 +7,12 @@ from models import (
 )
 
 from schemas import (
-	NoteSchema, NoteDeleted, NoteEdit
+	NoteSchema, NoteDeleted, NoteEdit,
 )
 
-from utils.common import get_pub_date_note
+from utils.common import (
+	get_pub_date_note, delete_file
+)
 
 
 async def get_notes():
@@ -99,12 +101,16 @@ async def deleting_note(note: NoteDeleted):
 		)
 
 		deleted_note = result.scalars().first()
+		file_name = await get_file_name(session, deleted_note.file_id)
+
+		await delete_file(file_name)
 
 		await session.delete(deleted_note)
 		await session.commit()
 
 
 async def editing_note(note: NoteEdit):
+	print(note)
 	async with Session() as session:
 		note_edit = await session.execute(
 			select(Note).filter_by(id = note.id)
@@ -114,10 +120,29 @@ async def editing_note(note: NoteEdit):
 		if not note.title:
 			note.title = None
 
+		if note.new_file_name and note.new_id_file:
+			note_edit.file_id = note.new_id_file
+			await delete_file(note.file_name)
+			await deleting_file(session, note.file_name)
+
 		note_edit.title = note.title
 		note_edit.text = note.text
 
 		await session.commit()
+
+
+async def deleting_file(
+	session: Session,
+	file_name: str
+):
+	result = await session.execute(
+		select(File).filter_by(file_name = file_name)
+	)
+	if result:
+		deleted_file = result.scalars().first()
+		if deleted_file:
+			await session.delete(deleted_file)
+			await session.commit()
 
 
 async def get_file(file_name: str) -> File:

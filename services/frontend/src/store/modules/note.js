@@ -25,6 +25,7 @@ export default {
 
 			editNote.titleNote = data.titleNote;
 			editNote.textNote = data.textNote;
+			if ( data.fileName ) editNote.fileName = data.fileName;
 		},
 		setNotes(state, notes) {
 			state.notes = notes;
@@ -38,7 +39,6 @@ export default {
 	},
 	actions: {
 		setNotes(state, notes) {
-			console.log(notes);
 			state.commit("setNotes", notes);
 		},
 		deleteNote: function(state, id) {
@@ -86,7 +86,7 @@ export default {
 				.then((res) => {
 					const note = res.data;
 					note["id"] = state.getters.getNotes.length;
-					console.log(note);
+
 					state.commit("addNote", note);
 				})
 				.catch((error) => {
@@ -98,16 +98,32 @@ export default {
 			});
 		},
 		editNote: function(state, data) {
-			axios.put("/note/edit", {
-				"idNote": data.note.idNote,
-				"titleNote": data.titleNote,
-				"textNote": data.textNote
+			const dataFile = new FormData();
+			dataFile.append("file", data.file);
+			axios.post("/note/create_file", dataFile, {
+				headers: {
+					'Content-Type': 'multipart/form-data'
+				}
+			}).then((res) => {
+				axios.put("/note/edit", {
+					"idNote": data.note.idNote,
+					"titleNote": data.titleNote,
+					"textNote": data.textNote,
+					"fileName": data.note.fileName,
+					"newFileName": res.data.fileName,
+					"newIdFile": res.data.idFile
+				})
+				.catch((error) => {
+					console.error(error);
+				});
+
+				if ( res.data.fileName ) data.fileName = res.data.fileName;
+
+				state.commit("editNote", data);
 			})
 			.catch((error) => {
 				console.error(error);
 			});
-
-			state.commit("editNote", data);
 		},
 	},
 	getters: {

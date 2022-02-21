@@ -2,7 +2,6 @@ from typing import Optional
 from typing import Union
 
 from datetime import datetime
-from fastapi import File
 
 from pydantic import BaseModel
 from pydantic import Field
@@ -22,9 +21,13 @@ class NoteDeleted(BaseModel):
 
 
 class NoteEdit(BaseModel):
-    id: Optional[int] = Field(None, alias = "idNote")
+    id: Optional[int] = Field(alias = "idNote")
     title: Optional[str] = Field(None, alias = "titleNote")
     text: Optional[str] = Field(alias = "textNote")
+    id_file: Optional[int] = Field(None, alias = "idFile")
+    file_name: Optional[str] = Field(None, alias = "fileName")
+    new_file_name: Optional[str] = Field(None, alias = "newFileName")
+    new_id_file: Optional[int] = Field(None, alias = "newIdFile")
 
 
 class FileCreate(BaseModel):

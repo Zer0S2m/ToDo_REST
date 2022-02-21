@@ -28,6 +28,12 @@ def create_unique_name_file(file_name: str) -> str:
 	return ".".join(split_file_name)
 
 
+async def delete_file(file_name: str):
+	if check_file_is_storage(file_name):
+		path = os.path.join(MEDIA_DIR, file_name)
+		os.remove(path)
+
+
 async def writing_file(
 	file: UploadFile,
 	file_path: str
