@@ -11,25 +11,36 @@
 						id="create-note-form"
 						@submit.prevent=submit
 					>
-						<div class="mb-3">
-							<label for="exampleInputTitle1" class="form-label">Title</label>
-							<input
-								v-model="titleNote"
-								type="text"
-								class="form-control" id="exampleInputTitle1"
-							>
-							<div class="form-text">Title is not required</div>
-						</div>
-						<div class="mb-3">
-							<label for="exampleFormControlTextarea1" class="form-label">Text</label>
-							<textarea
-								v-model="textNote"
-								class="form-control"
-								id="exampleFormControlTextarea1"
-								rows="3"
-								required
-							></textarea>
-						</div>
+					<div class="mb-3">
+						<label for="exampleInputTitle1" class="form-label">Title</label>
+						<input
+							v-model="titleNote"
+							type="text"
+							class="form-control" id="exampleInputTitle1"
+						>
+						<div class="form-text">Title is not required</div>
+					</div>
+					<div class="mb-3">
+						<label for="exampleFormControlTextarea1" class="form-label">Text</label>
+						<textarea
+							v-model="textNote"
+							class="form-control"
+							id="exampleFormControlTextarea1"
+							rows="3"
+							required
+						></textarea>
+					</div>
+					<div class="mb-3">
+						<label for="formFileMultiple" class="form-label">Attach file</label>
+						<input
+							class="form-control"
+							type="file"
+							id="formFileMultiple"
+							ref="file"
+							@change="uploadFile()"
+						>
+						<div class="form-text">File is not required.</div>
+					</div>
 				</form>
 				</div>
 				<div class="modal-footer">
@@ -55,6 +66,7 @@ export default {
 		return {
 			titleNote: "",
 			textNote: "",
+			file: "",
 		}
 	},
 	methods: {
@@ -72,9 +84,11 @@ export default {
 			};
 
 			const data = {
-				titleNote: this.titleNote,
-				textNote: this.textNote
+				'file': this.file,
+				"titleNote": this.titleNote,
+				"textNote": this.textNote
 			};
+
 			const actionForm = this.getActionForm;
 
 			if ( actionForm === "create" ) this.createNote(data)
@@ -84,6 +98,9 @@ export default {
 			};
 
 			this.closeModal();
+		},
+		uploadFile() {
+			this.file = this.$refs.file.files[0];
 		},
 		closeModal() {
 			this.setShowModalForm(false);
@@ -97,7 +114,8 @@ export default {
 		...mapGetters([
 			"getShowModal",
 			"getActionForm",
-			"getNote"
+			"getNotes",
+			"getNote",
 		])
 	},
 }

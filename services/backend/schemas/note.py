@@ -14,7 +14,7 @@ class NoteSchema(BaseModel):
     text: Optional[str] = Field(alias = "textNote")
     pub_date: Union[datetime, str] = Field(alias = "pubDate", default = datetime.now())
     id_file: Optional[int] = Field(None, alias = "idFile")
-    name_file: Optional[str] = Field(None, alias = "fileName")
+    file_name: Optional[str] = Field(None, alias = "fileName")
 
 
 class NoteDeleted(BaseModel):

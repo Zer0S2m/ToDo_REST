@@ -7,7 +7,7 @@ import Index from '@/components/Index'
 import NoteDetail from '@/components/NoteDetail'
 
 import axios from "axios"
-import { store } from "../store/store"
+import { store } from "../store/store.js"
 
 
 Vue.use(Router)
@@ -15,14 +15,22 @@ Vue.use(Router)
 const routes = [
 	{
 		path: '/',
+		redirect: to => {
+			return {
+				name: "Index"
+			};
+		}
+	},
+	{
+		path: "/note/",
 		name: 'Index',
-		component: Index
+		component: Index,
 	},
 	{
 		path: '/note/:id',
 		name: 'NoteDetail',
 		component: NoteDetail,
-	}
+	},
 ]
 
 const router = new VueRouter({
@@ -33,7 +41,7 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
 	if ( !store.getters.getNotes.length ) {
-		axios.get("/")
+		axios.get("/note")
 		.then((res) => {
 			const values = Object.values(res.data);
 			for ( let i = 0; i < values.length; i++ ) {

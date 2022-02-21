@@ -4,7 +4,6 @@ from fastapi import (
 	APIRouter, HTTPException, UploadFile,
 )
 from fastapi import File
-from fastapi.responses import FileResponse
 from fastapi.responses import StreamingResponse
 
 from schemas import (
@@ -52,7 +51,7 @@ async def get_note_api(
 	return note
 
 
-@router.post("/delete")
+@router.delete("/delete")
 async def delete_note(note: NoteDeleted):
 	await deleting_note(note)
 

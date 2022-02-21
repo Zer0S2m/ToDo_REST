@@ -7,8 +7,7 @@ from models import (
 )
 
 from schemas import (
-	NoteSchema, NoteDeleted, NoteEdit,
-	FileCreate
+	NoteSchema, NoteDeleted, NoteEdit
 )
 
 from utils.common import get_pub_date_note
@@ -22,11 +21,13 @@ async def get_notes():
 			select(Note)
 		)
 		for note in result.scalars():
+			file_name = await get_file_name(session, note.file_id)
 			notes.append(NoteSchema(
 				titleNote = note.title,
 				textNote = note.text,
 				idNote = note.id,
-				pubDate = get_pub_date_note(note.pub_date)
+				pubDate = get_pub_date_note(note.pub_date),
+				fileName = file_name
 			))
 
 	return notes
@@ -43,11 +44,13 @@ async def get_note(
 		)
 		result = result.scalars().first()
 		if result:
+			file_name = await get_file_name(session, result.file_id)
 			note = NoteSchema(
 				idNote = result.id,
 				titleNote = result.title,
 				textNote = result.text,
-				pubDate = get_pub_date_note(date = result.pub_date)
+				pubDate = get_pub_date_note(date = result.pub_date),
+				fileName = file_name
 			)
 
 	return note
@@ -60,13 +63,16 @@ async def creating_note(note: NoteSchema) -> NoteSchema:
 			text = note.text,
 			pub_date = note.pub_date
 		)
+		file_name = None
 		if note.id_file:
 			new_note.file_id = note.id_file
+			file_name = await get_file_name(session, note.id_file)
 
 		session.add(new_note)
 
 	note.id = new_note.id
 	note.pub_date = get_pub_date_note(date = note.pub_date)
+	note.file_name = file_name
 
 	return note
 
@@ -122,3 +128,17 @@ async def get_file(file_name: str) -> File:
 		file = file.scalars().first()
 
 	return file
+
+
+async def get_file_name(
+	session: Session,
+	file_id: int
+) -> str:
+	file_name = await session.execute(
+        select(File).filter_by(id=file_id)
+    )
+	file_name = file_name.scalars().first()
+	if file_name:
+		file_name = file_name.file_name
+
+	return file_name

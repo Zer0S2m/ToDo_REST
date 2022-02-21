@@ -10,3 +10,4 @@ __pycache__
 *.sln
 db_todo.db
 db
+media

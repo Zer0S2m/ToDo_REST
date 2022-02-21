@@ -38,40 +38,73 @@ export default {
 	},
 	actions: {
 		setNotes(state, notes) {
+			console.log(notes);
 			state.commit("setNotes", notes);
 		},
 		deleteNote: function(state, id) {
 			const idNote = state.getters.getNote(id).idNote;
 
-			axios.post(`note/delete`,{
-				idNote: idNote
+			axios.delete(`note/delete`,{
+				data: {
+					"idNote": idNote
+				}
+			}).catch(error => {
+				console.error(error)
 			});
 			state.commit("deleteNote", id);
 			state.commit("updateNotes", id);
 		},
-		createNote: function(state, data) {
-			axios.post("/note/create", {
-				titleNote: data.titleNote,
-				textNote: data.textNote,
-			})
-			.then((res) => {
-				const note = res.data;
-				note["id"] = state.getters.getNotes.length;
+		getNote: async function(state, id) {
+			let resNote;
 
-				state.commit("addNote", note);
+			await axios.get(`note/${id}`)
+			.then((res) => {
+				resNote = res.data;
 			})
 			.catch((error) => {
-				console.log(error);
+				console.error(error);
+			});
+
+			const notes = state.getters.getNotes;
+			const idNoteInArray = notes.find(note => note.idNote === resNote.idNote).id;
+
+			resNote.id = idNoteInArray;
+
+			return resNote;
+		},
+		createNote: function(state, data) {
+			const dataFile = new FormData();
+			dataFile.append("file", data.file);
+			axios.post("/note/create_file", dataFile, {
+				headers: {
+					'Content-Type': 'multipart/form-data'
+				}
+			}).then((res) => {
+				data.idFile = res.data.idFile;
+
+				axios.post("/note/create", data)
+				.then((res) => {
+					const note = res.data;
+					note["id"] = state.getters.getNotes.length;
+					console.log(note);
+					state.commit("addNote", note);
+				})
+				.catch((error) => {
+					console.error(error);
+				});
+			})
+			.catch((error) => {
+				console.error(error);
 			});
 		},
 		editNote: function(state, data) {
-			axios.post("/note/edit", {
+			axios.put("/note/edit", {
 				"idNote": data.note.idNote,
 				"titleNote": data.titleNote,
-				"textNote": data.textNote,
+				"textNote": data.textNote
 			})
 			.catch((error) => {
-				console.log(error);
+				console.error(error);
 			});
 
 			state.commit("editNote", data);
