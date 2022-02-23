@@ -75,23 +75,17 @@ export default {
 		createNote: function(state, data) {
 			const dataFile = new FormData();
 			dataFile.append("file", data.file);
-			axios.post("/note/create_file", dataFile, {
-				headers: {
-					'Content-Type': 'multipart/form-data'
-				}
-			}).then((res) => {
-				data.idFile = res.data.idFile;
+			delete data.file;
 
-				axios.post("/note/create", data)
-				.then((res) => {
-					const note = res.data;
-					note["id"] = state.getters.getNotes.length;
+			axios.post("/note/create", dataFile, {params: {
+				titleNote: data.titleNote,
+				textNote: data.textNote,
+			}})
+			.then((res) => {
+				const note = res.data;
+				note["id"] = state.getters.getNotes.length;
 
-					state.commit("addNote", note);
-				})
-				.catch((error) => {
-					console.error(error);
-				});
+				state.commit("addNote", note);
 			})
 			.catch((error) => {
 				console.error(error);
@@ -100,25 +94,16 @@ export default {
 		editNote: function(state, data) {
 			const dataFile = new FormData();
 			dataFile.append("file", data.file);
-			axios.post("/note/create_file", dataFile, {
-				headers: {
-					'Content-Type': 'multipart/form-data'
-				}
-			}).then((res) => {
-				axios.put("/note/edit", {
+
+			axios.put("/note/edit", dataFile, {
+				params: {
 					"idNote": data.note.idNote,
 					"titleNote": data.titleNote,
 					"textNote": data.textNote,
 					"fileName": data.note.fileName,
-					"newFileName": res.data.fileName,
-					"newIdFile": res.data.idFile
-				})
-				.catch((error) => {
-					console.error(error);
-				});
-
-				if ( res.data.fileName ) data.fileName = res.data.fileName;
-
+			}})
+			.then((res) => {
+				data.fileName = res.data.fileName;
 				state.commit("editNote", data);
 			})
 			.catch((error) => {

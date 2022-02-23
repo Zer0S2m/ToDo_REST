@@ -43,7 +43,7 @@ router.beforeEach((to, from, next) => {
 	if ( !store.getters.getNotes.length ) {
 		axios.get("/note")
 		.then((res) => {
-			const values = Object.values(res.data);
+			const values = Object.values(res.data.notes);
 			for ( let i = 0; i < values.length; i++ ) {
 				values[i].id = i;
 			};
