@@ -1,4 +1,7 @@
+import os
 from typing import Union
+
+from fastapi import UploadFile
 
 from sqlalchemy.future import select
 
@@ -11,8 +14,10 @@ from schemas import (
 )
 
 from utils.common import (
-	get_pub_date_note, delete_file
+	get_pub_date_note, delete_file_storage, check_path_media_dir,
+	writing_file, check_file_is_storage, create_unique_name_file
 )
+from config import MEDIA_DIR
 
 
 async def get_notes():
@@ -23,7 +28,7 @@ async def get_notes():
 			select(Note)
 		)
 		for note in result.scalars():
-			file_name = await get_file_name(session, note.file_id)
+			file_name = await get_file_name(session, note.id_file)
 			notes.append(NoteSchema(
 				titleNote = note.title,
 				textNote = note.text,
@@ -46,7 +51,7 @@ async def get_note(
 		)
 		result = result.scalars().first()
 		if result:
-			file_name = await get_file_name(session, result.file_id)
+			file_name = await get_file_name(session, result.id_file)
 			note = NoteSchema(
 				idNote = result.id,
 				titleNote = result.title,
@@ -58,23 +63,24 @@ async def get_note(
 	return note
 
 
-async def creating_note(note: NoteSchema) -> NoteSchema:
+async def creating_note(
+	note: NoteSchema,
+	id_file: int
+) -> NoteSchema:
 	async with Session.begin() as session:
 		new_note = Note(
 			title = note.title,
 			text = note.text,
 			pub_date = note.pub_date
 		)
-		file_name = None
-		if note.id_file:
-			new_note.file_id = note.id_file
-			file_name = await get_file_name(session, note.id_file)
+		if id_file:
+			new_note.id_file = id_file
+			note.file_name = note.file_name
 
 		session.add(new_note)
 
 	note.id = new_note.id
 	note.pub_date = get_pub_date_note(date = note.pub_date)
-	note.file_name = file_name
 
 	return note
 
@@ -101,16 +107,18 @@ async def deleting_note(note: NoteDeleted):
 		)
 
 		deleted_note = result.scalars().first()
-		file_name = await get_file_name(session, deleted_note.file_id)
+		file_name = await get_file_name(session, deleted_note.id_file)
 
-		await delete_file(file_name)
+		await delete_file_storage(file_name)
 
 		await session.delete(deleted_note)
 		await session.commit()
 
 
-async def editing_note(note: NoteEdit):
-	print(note)
+async def editing_note(
+	note: NoteEdit,
+	data_file: dict
+):
 	async with Session() as session:
 		note_edit = await session.execute(
 			select(Note).filter_by(id = note.id)
@@ -120,18 +128,21 @@ async def editing_note(note: NoteEdit):
 		if not note.title:
 			note.title = None
 
-		if note.new_file_name and note.new_id_file:
-			note_edit.file_id = note.new_id_file
-			await delete_file(note.file_name)
-			await deleting_file(session, note.file_name)
+		if data_file:
+			await delete_file_storage(note.file_name)
+			await deleting_file_db(session, note.file_name)
+
+			note_edit.id_file = data_file["id_file"]
 
 		note_edit.title = note.title
 		note_edit.text = note.text
 
 		await session.commit()
 
+	return note
 
-async def deleting_file(
+
+async def deleting_file_db(
 	session: Session,
 	file_name: str
 ):
@@ -157,13 +168,33 @@ async def get_file(file_name: str) -> File:
 
 async def get_file_name(
 	session: Session,
-	file_id: int
+	id_file: int
 ) -> str:
 	file_name = await session.execute(
-        select(File).filter_by(id=file_id)
-    )
+		select(File).filter_by(id = id_file)
+	)
 	file_name = file_name.scalars().first()
 	if file_name:
 		file_name = file_name.file_name
 
 	return file_name
+
+
+async def set_file_note(file: UploadFile) -> dict:
+	check_path_media_dir()
+
+	if check_file_is_storage(file.filename):
+		unique_name_file = create_unique_name_file(file.filename)
+		file_path = os.path.join(MEDIA_DIR, unique_name_file)
+		file_name = unique_name_file
+	else:
+		file_path = os.path.join(MEDIA_DIR, file.filename)
+		file_name = file.filename
+
+	id_file = await creating_file_note(file_path, file_name)
+	await writing_file(file, file_path)
+
+	return {
+		"id_file": id_file,
+		"file_name": file_name
+	}

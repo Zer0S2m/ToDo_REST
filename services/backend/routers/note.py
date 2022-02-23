@@ -1,25 +1,19 @@
-import os
-
 from fastapi import (
 	APIRouter, HTTPException, UploadFile,
+	Depends
 )
 from fastapi import File
 from fastapi.responses import StreamingResponse
 
 from schemas import (
 	NoteSchema, NoteDeleted, NoteEdit,
-	FileCreate
+	NoteList
 )
-from config import MEDIA_DIR
 
-from utils.common import (
-	check_path_media_dir, writing_file, check_file_is_storage,
-	create_unique_name_file
-)
 from utils.db import (
 	get_notes, get_note, deleting_note,
-	editing_note, creating_note, creating_file_note,
-	get_file
+	editing_note, creating_note, set_file_note,
+	get_file, 
 )
 
 
@@ -29,10 +23,14 @@ router = APIRouter(
 )
 
 
-@router.get("/")
+@router.get(
+	"/",
+	response_model = NoteList,
+	response_model_exclude_unset = True,
+)
 async def list_notes():
 	notes = await get_notes()
-	return notes
+	return {"notes": notes}
 
 
 @router.get(
@@ -56,55 +54,43 @@ async def delete_note(note: NoteDeleted):
 	await deleting_note(note)
 
 
-@router.put("/edit")
-async def edit_note(
-	note: NoteEdit
-):
-	await editing_note(note)
-
-
-@router.post(
-	"/create",
-	response_model = NoteSchema,
-	response_model_exclude = {"id_file"}
+@router.put(
+	"/edit",
+	response_model = NoteEdit
 )
-async def create_note(
-	note: NoteSchema
-) -> NoteSchema:
-	note = await creating_note(note)
+async def edit_note(
+	note: NoteEdit = Depends(),
+	file: UploadFile = File(None)
+):
+	data_file = {}
+	if file:
+		data_file = await set_file_note(file)
+
+	note = await editing_note(note, data_file)
+
+	if data_file:
+		note.file_name = data_file["file_name"]
+
 	return note
 
 
 @router.post(
-	"/create_file",
-	response_model = FileCreate
+	"/create",
+	response_model = NoteSchema
 )
-async def create_file(
+async def create_note(
+	note: NoteSchema = Depends(),
 	file: UploadFile = File(None)
-) -> FileCreate:
+) -> NoteSchema:
+	id_file = 0
 	if file:
-		check_path_media_dir()
+		data_file = await set_file_note(file)
 
-		if check_file_is_storage(file.filename):
-			unique_name_file = create_unique_name_file(file.filename)
-			file_path = os.path.join(MEDIA_DIR, unique_name_file)
-			file_name = unique_name_file
-		else:
-			file_path = os.path.join(MEDIA_DIR, file.filename)
-			file_name = file.filename
+		id_file = data_file["id_file"]
+		note.file_name = data_file["file_name"]
 
-		file_id = await creating_file_note(file_path, file_name)
-		await writing_file(file, file_path)
-
-		return FileCreate(
-			idFile = file_id,
-			fileName = file_name
-		)
-
-	return FileCreate(
-		idFile = None,
-		fileName = None
-	)
+	note = await creating_note(note, id_file)
+	return note
 
 
 @router.get(

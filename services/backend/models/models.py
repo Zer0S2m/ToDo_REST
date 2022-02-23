@@ -34,7 +34,7 @@ class Note(Base):
     text = Column(Text(LIMIT_TEXT), nullable = False)
     pub_date = Column(DateTime, default = datetime.now())
     file = relationship("File", backref = "note_file", cascade = "all, delete")
-    file_id = Column(Integer, ForeignKey('file.id', ondelete = "CASCADE"), default = False)
+    id_file = Column(Integer, ForeignKey('file.id', ondelete = "CASCADE"), default = False)
 
 
     def __repr__(self) -> str:
