@@ -1,5 +1,5 @@
 from datetime import datetime
-from email.policy import default
+from enum import unique
 
 from sqlalchemy import (
 	Column, Integer, String,
@@ -51,3 +51,16 @@ class File(Base):
 
     def __repr__(self) -> str:
         return f"<id: {self.id}> - <title: {self.file_name}>"
+
+
+class User(Base):
+    __tablename__ = "user"
+
+    id = Column(Integer, primary_key = True, unique = True)
+    username = Column(String, nullable = False, unique = True)
+    password = Column(String, nullable = False)
+    email = Column(String, nullable = True)
+
+
+    def __repr__(self) -> str:
+        return f"<id: {self.id}> - <username: {self.username}>"

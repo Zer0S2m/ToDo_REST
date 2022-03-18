@@ -1,3 +1,4 @@
 from models.models import (
-    Note, File, Session
+    Note, File, User,
+    Session
 )

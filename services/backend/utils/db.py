@@ -6,17 +6,21 @@ from fastapi import UploadFile
 from sqlalchemy.future import select
 
 from models import (
-	Note, File, Session
+	Note, File, User,
+	Session
 )
 
 from schemas import (
 	NoteSchema, NoteDeleted, NoteEdit,
+	UserCreate
 )
 
 from utils.common import (
 	get_pub_date_note, delete_file_storage, check_path_media_dir,
 	writing_file, check_file_is_storage, create_unique_name_file
 )
+from utils.users import get_password_hash
+
 from config import MEDIA_DIR
 
 
@@ -198,3 +202,32 @@ async def set_file_note(file: UploadFile) -> dict:
 		"id_file": id_file,
 		"file_name": file_name
 	}
+
+
+async def create_user_db(user: UserCreate) -> User:
+	hash_password = get_password_hash(user.password)
+
+	async with Session.begin() as session:
+		new_user = User(
+			username = user.username.strip(),
+			password = hash_password
+		)
+		session.add(new_user)
+		await session.commit()
+
+	return new_user
+
+
+async def get_user(
+	username: str
+) -> Union[User, bool]:
+	async with Session.begin() as session:
+		user = await session.execute(
+			select(User).filter_by(username = username)
+		)
+		user = user.scalars().first()
+
+		if user:
+			return user
+		else:
+			return False
