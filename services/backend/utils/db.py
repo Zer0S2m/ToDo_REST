@@ -12,7 +12,7 @@ from models import (
 
 from schemas import (
 	NoteSchema, NoteDeleted, NoteEdit,
-	UserCreate
+	UserCreate, NoteCreate
 )
 
 from utils.common import (
@@ -68,8 +68,9 @@ async def get_note(
 
 
 async def creating_note(
-	note: NoteSchema,
-	id_file: int
+	note: NoteCreate,
+	id_file: int,
+	file_name: Union[str, bool]
 ) -> NoteSchema:
 	async with Session.begin() as session:
 		new_note = Note(
@@ -79,14 +80,16 @@ async def creating_note(
 		)
 		if id_file:
 			new_note.id_file = id_file
-			note.file_name = note.file_name
 
 		session.add(new_note)
 
-	note.id = new_note.id
-	note.pub_date = get_pub_date_note(date = note.pub_date)
-
-	return note
+	return NoteSchema(
+		titleNote = note.title,
+		textNote = note.text,
+		pubDate = get_pub_date_note(date = note.pub_date),
+		idNote = new_note.id,
+		fileName = file_name
+	)
 
 
 async def creating_file_note(
@@ -212,6 +215,9 @@ async def create_user_db(user: UserCreate) -> User:
 			username = user.username.strip(),
 			password = hash_password
 		)
+		if user.email:
+			new_user.email = user.email
+
 		session.add(new_user)
 		await session.commit()
 
@@ -231,3 +237,18 @@ async def get_user(
 			return user
 		else:
 			return False
+
+
+async def check_email_user_is_db(
+	email: str
+) -> bool:
+	async with Session.begin() as session:
+		user = await session.execute(
+			select(User).filter_by(email = email)
+		)
+		user = user.scalars().first()
+
+		if user:
+			return True
+
+	return False

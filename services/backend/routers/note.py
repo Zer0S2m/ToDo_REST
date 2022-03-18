@@ -7,7 +7,7 @@ from fastapi.responses import StreamingResponse
 
 from schemas import (
 	NoteSchema, NoteDeleted, NoteEdit,
-	NoteList
+	NoteList, NoteCreate
 )
 
 from utils.db import (
@@ -79,17 +79,18 @@ async def edit_note(
 	response_model = NoteSchema
 )
 async def create_note(
-	note: NoteSchema = Depends(),
+	note: NoteCreate = Depends(),
 	file: UploadFile = File(None)
 ) -> NoteSchema:
 	id_file = 0
+	file_name = False
 	if file:
 		data_file = await set_file_note(file)
 
 		id_file = data_file["id_file"]
-		note.file_name = data_file["file_name"]
+		file_name = data_file["file_name"]
 
-	note = await creating_note(note, id_file)
+	note = await creating_note(note, id_file, file_name)
 	return note
 
 

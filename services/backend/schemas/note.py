@@ -9,14 +9,18 @@ from pydantic import Field
 
 
 class BaseNote(BaseModel):
-    id: Optional[int] = Field(None, alias = "idNote")
     title: Optional[str] = Field(None, alias = "titleNote")
     text: Optional[str] = Field(alias = "textNote")
-    file_name: Optional[str] = Field(None, alias = "fileName")
-
-
-class NoteSchema(BaseNote, BaseModel):
     pub_date: Union[datetime, str] = Field(alias = "pubDate", default = datetime.now())
+
+
+class NoteSchema(BaseNote):
+    id: Optional[int] = Field(None, alias = "idNote")
+    file_name: Union[bool, str] = Field(None, alias = "fileName")
+
+
+class NoteCreate(BaseNote):
+    ...
 
 
 class NoteList(BaseModel):
@@ -27,5 +31,6 @@ class NoteDeleted(BaseModel):
     id: Optional[int] = Field(alias = "idNote")
 
 
-class NoteEdit(BaseNote, BaseModel):
+class NoteEdit(BaseNote):
     id: Optional[int] = Field(alias = "idNote")
+    file_name: Union[bool, str] = Field(None, alias = "fileName")

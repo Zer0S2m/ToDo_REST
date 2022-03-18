@@ -4,8 +4,9 @@ from fastapi import (
     Depends, APIRouter, HTTPException,
     status
 )
-from fastapi.security import OAuth2PasswordBearer
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import (
+    OAuth2PasswordBearer, OAuth2PasswordRequestForm
+)
 
 from jose import JWTError
 from jose import jwt
@@ -15,10 +16,12 @@ from schemas import (
     Token, TokenData
 )
 
-from utils.users import create_access_token
-from utils.users import verify_password
-from utils.db import create_user_db
-from utils.db import get_user
+from utils.users import (
+    create_access_token, verify_password
+)
+from utils.db import (
+    create_user_db, get_user, check_email_user_is_db
+)
 
 from config import (
     SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
@@ -107,6 +110,11 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     response_model = User
 )
 async def create_user(user: UserCreate):
+    if await check_email_user_is_db(email = user.email):
+        raise HTTPException(status_code = 400, detail = "Email already registered")
+    if await get_user(username = user.username):
+        raise HTTPException(status_code = 400, detail = "Username already registered")
+    
     new_user = await create_user_db(user)
     return {
         "username": new_user.username,
