@@ -35,6 +35,7 @@ class Note(Base):
     pub_date = Column(DateTime, default = datetime.now())
     file = relationship("File", backref = "note_file", cascade = "all, delete")
     id_file = Column(Integer, ForeignKey('file.id', ondelete = "CASCADE"), default = False)
+    user_id = Column(Integer, ForeignKey('user.id'))
 
 
     def __repr__(self) -> str:
@@ -47,6 +48,7 @@ class File(Base):
     id = Column(Integer, primary_key = True, unique = True)
     file_path = Column(String, nullable = False)
     file_name = Column(String, unique = True, nullable = False)
+    user_id = Column(Integer, ForeignKey('user.id'))
 
 
     def __repr__(self) -> str:
@@ -60,6 +62,8 @@ class User(Base):
     username = Column(String, nullable = False, unique = True)
     password = Column(String, nullable = False)
     email = Column(String, nullable = True)
+    notes = relationship("Note", backref = "user_notes", cascade = "all, delete")
+    files = relationship("File", backref = "user_files", cascade = "all, delete")
 
 
     def __repr__(self) -> str:

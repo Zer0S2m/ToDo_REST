@@ -27,3 +27,4 @@ class User(UserBase):
 
 class UserInDB(User):
     password: str
+    user_id: int

@@ -15,11 +15,15 @@ from utils.db import (
 	editing_note, creating_note, set_file_note,
 	get_file, 
 )
+from utils.users import get_current_user
+
+from config import oauth2_scheme
 
 
 router = APIRouter(
 	prefix = "/note",
-	tags = ["note"]
+	tags = ["note"],
+	responses = {404: {"description": "Not found"}},
 )
 
 
@@ -28,8 +32,9 @@ router = APIRouter(
 	response_model = NoteList,
 	response_model_exclude_unset = True,
 )
-async def list_notes():
-	notes = await get_notes()
+async def list_notes(token: str = Depends(oauth2_scheme)):
+	current_user = await get_current_user(token)
+	notes = await get_notes(current_user)
 	return {"notes": notes}
 
 
@@ -39,9 +44,11 @@ async def list_notes():
 	response_model_exclude = {"id_file"}
 )
 async def get_note_api(
-	note_id: int
+	note_id: int,
+	token: str = Depends(oauth2_scheme)
 ) -> NoteSchema:
-	note = await get_note(note_id)
+	current_user = await get_current_user(token)
+	note = await get_note(note_id, current_user)
 
 	if not note:
 		raise HTTPException(status_code = 404, detail = "Note not found")
@@ -50,8 +57,15 @@ async def get_note_api(
 
 
 @router.delete("/delete")
-async def delete_note(note: NoteDeleted):
-	await deleting_note(note)
+async def delete_note(
+	note: NoteDeleted,
+	token: str = Depends(oauth2_scheme)
+):
+	current_user = await get_current_user(token)
+	is_deleted_note = await deleting_note(note, current_user)
+
+	if not is_deleted_note:
+		raise HTTPException(status_code = 404, detail = "Note not found")
 
 
 @router.put(
@@ -60,13 +74,15 @@ async def delete_note(note: NoteDeleted):
 )
 async def edit_note(
 	note: NoteEdit = Depends(),
-	file: UploadFile = File(None)
+	file: UploadFile = File(None),
+	token: str = Depends(oauth2_scheme)
 ):
+	current_user = await get_current_user(token)
 	data_file = {}
 	if file:
-		data_file = await set_file_note(file)
+		data_file = await set_file_note(file, current_user)
 
-	note = await editing_note(note, data_file)
+	note = await editing_note(note, data_file, current_user)
 
 	if data_file:
 		note.file_name = data_file["file_name"]
@@ -80,25 +96,32 @@ async def edit_note(
 )
 async def create_note(
 	note: NoteCreate = Depends(),
-	file: UploadFile = File(None)
+	file: UploadFile = File(None),
+	token: str = Depends(oauth2_scheme)
 ) -> NoteSchema:
+	current_user = await get_current_user(token)
 	id_file = 0
 	file_name = False
+
 	if file:
-		data_file = await set_file_note(file)
+		data_file = await set_file_note(file, current_user)
 
 		id_file = data_file["id_file"]
 		file_name = data_file["file_name"]
 
-	note = await creating_note(note, id_file, file_name)
+	note = await creating_note(note, id_file, file_name, current_user)
 	return note
 
 
 @router.get(
 	"/file/{file_name}"
 )
-async def get_file_api(file_name: str):
-	file = await get_file(file_name)
+async def get_file_api(
+	file_name: str,
+	token: str = Depends(oauth2_scheme)
+):
+	current_user = await get_current_user(token)
+	file = await get_file(file_name, current_user)
 
 	if not file:
 		raise HTTPException(status_code = 404, detail = "File not found")

@@ -4,10 +4,20 @@ from datetime import timedelta
 from datetime import datetime
 
 from jose import jwt
+from jose import JWTError
+
+from fastapi import (
+    Depends, status, HTTPException
+)
+
+from schemas import UserInDB
+from schemas import TokenData
 
 from config import (
-    SECRET_KEY, ALGORITHM, pwd_context
+    SECRET_KEY, ALGORITHM, oauth2_scheme
 )
+
+from utils.db import get_user
 
 
 def create_access_token(
@@ -25,9 +35,33 @@ def create_access_token(
     return encoded_jwt
 
 
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+async def get_current_user(
+    token: str = Depends(oauth2_scheme)
+) -> UserInDB:
+    credentials_exception = HTTPException(
+        status_code = status.HTTP_401_UNAUTHORIZED,
+        detail = "Could not validate credentials",
+        headers = {"WWW-Authenticate": "Bearer"},
+    )
 
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms = [ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
 
-def get_password_hash(password):
-    return pwd_context.hash(password)
+        token_data = TokenData(username = username)
+    except JWTError:
+        raise credentials_exception
+
+    user = await get_user(username = token_data.username)
+    user = UserInDB(
+        username = user.username,
+        password = user.password,
+        email = user.email,
+        user_id = user.id
+    )
+
+    if user is None:
+        raise credentials_exception
+    return user

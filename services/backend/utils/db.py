@@ -1,5 +1,7 @@
 import os
+from pickle import FALSE
 from typing import Union
+from typing import List
 
 from fastapi import UploadFile
 
@@ -12,24 +14,26 @@ from models import (
 
 from schemas import (
 	NoteSchema, NoteDeleted, NoteEdit,
-	UserCreate, NoteCreate
+	UserCreate, NoteCreate, UserInDB
 )
 
 from utils.common import (
 	get_pub_date_note, delete_file_storage, check_path_media_dir,
 	writing_file, check_file_is_storage, create_unique_name_file
 )
-from utils.users import get_password_hash
+from utils.password import get_password_hash
 
 from config import MEDIA_DIR
 
 
-async def get_notes():
+async def get_notes(
+	current_user: UserInDB
+) -> List[NoteSchema]:
 	notes = []
 
 	async with Session.begin() as session:
 		result = await session.execute(
-			select(Note)
+			select(Note).filter_by(user_id = current_user.user_id)
 		)
 		for note in result.scalars():
 			file_name = await get_file_name(session, note.id_file)
@@ -45,13 +49,14 @@ async def get_notes():
 
 
 async def get_note(
-	note_id: int
+	note_id: int,
+	current_user: UserInDB
 ) -> Union[None, NoteSchema]:
 	note = None
 
 	async with Session.begin() as session:
 		result = await session.execute(
-			select(Note).filter_by(id = note_id)
+			select(Note).filter_by(id = note_id, user_id = current_user.user_id)
 		)
 		result = result.scalars().first()
 		if result:
@@ -70,13 +75,15 @@ async def get_note(
 async def creating_note(
 	note: NoteCreate,
 	id_file: int,
-	file_name: Union[str, bool]
+	file_name: Union[str, bool],
+	current_user: UserInDB
 ) -> NoteSchema:
 	async with Session.begin() as session:
 		new_note = Note(
 			title = note.title,
 			text = note.text,
-			pub_date = note.pub_date
+			pub_date = note.pub_date,
+			user_id = current_user.user_id
 		)
 		if id_file:
 			new_note.id_file = id_file
@@ -94,12 +101,14 @@ async def creating_note(
 
 async def creating_file_note(
 	file_path: str,
-	file_name: str
+	file_name: str,
+	current_user: UserInDB
 ) -> int:
 	async with Session.begin() as session:
 		new_file = File(
 			file_path = file_path,
-			file_name = file_name
+			file_name = file_name,
+			user_id = current_user.user_id
 		)
 		session.add(new_file)
 		await session.commit()
@@ -107,28 +116,37 @@ async def creating_file_note(
 	return new_file.id
 
 
-async def deleting_note(note: NoteDeleted):
+async def deleting_note(
+	note: NoteDeleted,
+	current_user: UserInDB
+) -> bool:
 	async with Session() as session:
 		result = await session.execute(
-			select(Note).filter_by(id = note.id)
+			select(Note).filter_by(id = note.id, user_id = current_user.user_id)
 		)
 
 		deleted_note = result.scalars().first()
-		file_name = await get_file_name(session, deleted_note.id_file)
+		if deleted_note:
+			file_name = await get_file_name(session, deleted_note.id_file)
 
-		await delete_file_storage(file_name)
+			await delete_file_storage(file_name)
 
-		await session.delete(deleted_note)
-		await session.commit()
+			await session.delete(deleted_note)
+			await session.commit()
+
+			return True
+		else:
+			return False
 
 
 async def editing_note(
 	note: NoteEdit,
-	data_file: dict
-):
+	data_file: dict,
+	current_user: UserInDB
+) -> NoteEdit:
 	async with Session() as session:
 		note_edit = await session.execute(
-			select(Note).filter_by(id = note.id)
+			select(Note).filter_by(id = note.id, user_id = current_user.user_id)
 		)
 		note_edit = note_edit.scalars().first()
 
@@ -163,10 +181,13 @@ async def deleting_file_db(
 			await session.commit()
 
 
-async def get_file(file_name: str) -> File:
+async def get_file(
+	file_name: str,
+	current_user: UserInDB
+) -> File:
 	async with Session.begin() as session:
 		file = await session.execute(
-			select(File).filter_by(file_name = file_name)
+			select(File).filter_by(file_name = file_name, user_id = current_user.user_id)
 		)
 		file = file.scalars().first()
 
@@ -187,7 +208,10 @@ async def get_file_name(
 	return file_name
 
 
-async def set_file_note(file: UploadFile) -> dict:
+async def set_file_note(
+	file: UploadFile,
+	current_user: UserInDB
+) -> dict:
 	check_path_media_dir()
 
 	if check_file_is_storage(file.filename):
@@ -198,7 +222,7 @@ async def set_file_note(file: UploadFile) -> dict:
 		file_path = os.path.join(MEDIA_DIR, file.filename)
 		file_name = file.filename
 
-	id_file = await creating_file_note(file_path, file_name)
+	id_file = await creating_file_note(file_path, file_name, current_user)
 	await writing_file(file, file_path)
 
 	return {
@@ -242,13 +266,14 @@ async def get_user(
 async def check_email_user_is_db(
 	email: str
 ) -> bool:
-	async with Session.begin() as session:
-		user = await session.execute(
-			select(User).filter_by(email = email)
-		)
-		user = user.scalars().first()
+	if email:
+		async with Session.begin() as session:
+			user = await session.execute(
+				select(User).filter_by(email = email)
+			)
+			user = user.scalars().first()
 
-		if user:
-			return True
+			if user:
+				return True
 
 	return False
