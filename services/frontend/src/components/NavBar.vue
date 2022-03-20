@@ -10,8 +10,35 @@
 					<span>ToDo</span>
 				</router-link>
 				<div>
-					<button @click="openModal" type="button" class="btn btn-primary">
+					<router-link
+						:to="{ name: 'UserAuth' }"
+						class="btn btn-primary"
+						v-if="!getInLogin"
+					>
+						<span>Auth</span>
+					</router-link>
+					<router-link
+						:to="{ name: 'UserSignUp' }"
+						class="btn btn-primary"
+						v-if="!getInLogin"
+					>
+						<span>Sign up</span>
+					</router-link>
+					<button
+						v-if="getInLogin"
+						@click="openModal"
+						type="button"
+						class="btn btn-primary"
+					>
   					Add note
+					</button>
+					<button
+						v-if="getInLogin"
+						@click="logoutUser"
+						type="button"
+						class="btn btn-primary"
+					>
+						Logout
 					</button>
 				</div>
 			</div>
@@ -20,7 +47,11 @@
 </template>
 
 <script>
-import { mapMutations } from "vuex";
+import {
+	mapMutations,
+	mapGetters,
+	mapActions
+} from "vuex";
 
 import ModalForm from "./ModalForm";
 
@@ -35,10 +66,18 @@ export default {
 			"setShowModalForm",
 			"setActionForFormNote"
 		]),
+		...mapActions([
+			"logoutUser"
+		]),
 		openModal() {
 			this.setShowModalForm(true);
 			this.setActionForFormNote("create");
 		},
+	},
+	computed: {
+		...mapGetters([
+			"getInLogin",
+		])
 	},
 }
 </script>

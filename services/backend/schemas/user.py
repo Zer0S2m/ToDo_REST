@@ -1,11 +1,12 @@
 from typing import Optional
 
 from pydantic import BaseModel
+from pydantic import Field
 
 
 class Token(BaseModel):
-    access_token: str
-    token_type: str
+    access_token: Optional[str] = Field(alias = "accessToken")
+    token_type: Optional[str] = Field(alias = "tokenType")
 
 
 class TokenData(BaseModel):

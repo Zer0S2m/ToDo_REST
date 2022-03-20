@@ -54,6 +54,20 @@ export default {
 			state.commit("deleteNote", id);
 			state.commit("updateNotes", id);
 		},
+		getNotes: function(state) {
+			axios.get("/note")
+				.then((res) => {
+					const values = Object.values(res.data.notes);
+					for ( let i = 0; i < values.length; i++ ) {
+						values[i].id = i;
+					};
+		
+					state.dispatch("setNotes", values);
+				})
+				.catch((error) => {
+					console.error(error);
+				});
+		},
 		getNote: async function(state, id) {
 			let resNote;
 
@@ -84,6 +98,8 @@ export default {
 			.then((res) => {
 				const note = res.data;
 				note["id"] = state.getters.getNotes.length;
+				
+				if ( !note.fileName ) note.fileName = null;
 
 				state.commit("addNote", note);
 			})
