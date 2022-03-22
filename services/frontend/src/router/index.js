@@ -1,18 +1,15 @@
-import 'bootstrap/dist/css/bootstrap.css';
-
-import Vue from 'vue'
-import Router from 'vue-router'
-import VueRouter from 'vue-router'
 import Index from '@/components/Index'
 import NoteDetail from '@/components/NoteDetail'
 import UserSignUp from '@/components/UserSignUp'
 import UserAuth from '@/components/UserAuth'
 
 import axios from "axios"
-import { store } from "@/store/store.js";
+import store from "@/store/store.js";
+import {
+	createRouter,
+	createWebHashHistory
+} from 'vue-router'
 
-
-Vue.use(Router)
 
 const routes = [
 	{
@@ -45,10 +42,10 @@ const routes = [
 	}
 ]
 
-const router = new VueRouter({
-	mode: 'history',
+const router = createRouter({
 	base: process.env.BASE_URL,
-	routes,
+  history: createWebHashHistory(),
+  routes
 })
 
 if ( store.getters.getToken ) {
@@ -69,7 +66,7 @@ if ( store.getters.getToken ) {
 			});
 		} else {
 			next();
-		}
+		};
 	});
 };
 

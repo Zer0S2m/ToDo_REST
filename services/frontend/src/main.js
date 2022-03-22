@@ -1,11 +1,14 @@
-import Vue from 'vue'
-import App from './App';
-import axios from 'axios';
+import { createApp } from 'vue'
+import axios from 'axios'
+import BootstrapVue3 from 'bootstrap-vue-3'
+
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue-3/dist/bootstrap-vue-3.css'
+
+import App from './App.vue'
 import router from './router'
-import { store } from "./store/store"
+import store from './store/store'
 
-
-Vue.config.productionTip = false
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = 'http://localhost:5000/';
@@ -15,9 +18,8 @@ if ( token ) {
 	axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 };
 
-
-new Vue({
-	router,
-	store: store,
-	render: h => h(App)
-}).$mount('#app');
+const app = createApp(App);
+app.use(store);
+app.use(router);
+app.use(BootstrapVue3);
+app.mount('#app');

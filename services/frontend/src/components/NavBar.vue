@@ -12,7 +12,7 @@
 				<div>
 					<router-link
 						:to="{ name: 'UserAuth' }"
-						class="btn btn-primary"
+						class="btn btn-primary me-2"
 						v-if="!getInLogin"
 					>
 						<span>Auth</span>
@@ -28,7 +28,7 @@
 						v-if="getInLogin"
 						@click="openModal"
 						type="button"
-						class="btn btn-primary"
+						class="btn btn-primary me-2"
 					>
   					Add note
 					</button>

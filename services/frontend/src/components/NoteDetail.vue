@@ -15,7 +15,7 @@
 			>
 			{{ note.fileName }}
 			</button>
-			<button @click="editNote" type="button" class="btn btn-primary">Edit</button>
+			<button @click="editNote" type="button" class="btn btn-primary me-2">Edit</button>
 			<button @click="toDeleteNote" type="button" class="btn btn-danger">Delete</button>
 		</div>
 		<div class="card-footer text-muted">
