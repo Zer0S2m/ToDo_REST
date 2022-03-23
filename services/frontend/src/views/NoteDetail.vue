@@ -51,9 +51,6 @@ export default {
 		]),
 		toDeleteNote() {
 			this.deleteNote(this.note.id);
-			this.$router.push({
-				name: "Index"
-			});
 		},
 		editNote() {
 			this.setShowModalForm(true);

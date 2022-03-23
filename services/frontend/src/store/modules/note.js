@@ -1,5 +1,7 @@
 import axios from "axios"
 
+import router from "@/router";
+
 
 export default {
 	state: {
@@ -48,11 +50,18 @@ export default {
 				data: {
 					"idNote": idNote
 				}
-			}).catch(error => {
+			})
+			.then((res) => {
+				state.commit("deleteNote", id);
+				state.commit("updateNotes", id);
+
+				router.push({
+					name: "Index"
+				});
+			})
+			.catch(error => {
 				console.error(error)
 			});
-			state.commit("deleteNote", id);
-			state.commit("updateNotes", id);
 		},
 		getNotes: function(state) {
 			axios.get("/note")

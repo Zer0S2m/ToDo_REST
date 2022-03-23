@@ -1,5 +1,7 @@
 import axios from "axios";
 
+import router from "@/router";
+
 
 export default {
 	state: {
@@ -14,13 +16,14 @@ export default {
 		}
 	},
 	actions: {
-		loginUser: function(state, data) {
+		loginUser: async function(state, data) {
+			let errorPost;
 			const { username, password } = data;
 			const formData = new FormData();
 			formData.append("username", username);
 			formData.append("password", password);
 
-			axios.post("/user/auth", formData)
+			await axios.post("/user/auth", formData)
 				.then((res) => { 
 					const data = res.data;
 					localStorage.setItem('token', data.accessToken);
@@ -29,28 +32,46 @@ export default {
 
 					state.commit("setToken", data.accessToken);
 					state.dispatch("getNotes");
+
+					router.push({
+						name: "Index"
+					});
 				})
 				.catch((error) => {
-					console.error(error);
+					errorPost = error.response.data;
 				});
-		},
-		signUpUser: function(state, data) {
-			const { username, password, email } = data;
 
-			axios.post("/user/sign-up", {
+			return errorPost;
+		},
+		signUpUser: async function(state, data) {
+			const { username, password, email } = data;
+			let errorObj;
+
+			await axios.post("/user/sign-up", {
 					username,
 					password,
 					email
 			})
+				.then((res) => {
+					router.push({
+						name: "UserAuth"
+					});
+				})
 				.catch((error) => {
-					console.error(error);
+					errorObj = error.response.data;
 				});
+
+			return errorObj;
 		},
 		logoutUser: function(state) {
 			state.commit('clearUser');
 			state.dispatch("setNotes", []);
 			localStorage.removeItem('token');
 			delete axios.defaults.headers.common['Authorization'];
+
+			router.push({
+				name: "UserAuth"
+			});
 		},
 	},
 	getters: {

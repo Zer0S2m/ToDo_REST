@@ -11,7 +11,7 @@
 <script>
 import { mapGetters } from "vuex";
 
-import NoteItem from "./NoteItem";
+import NoteItem from "@/components/NoteItem";
 
 
 export default {

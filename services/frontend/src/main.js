@@ -7,7 +7,7 @@ import 'bootstrap-vue-3/dist/bootstrap-vue-3.css'
 
 import App from './App.vue'
 import router from './router'
-import store from './store/store'
+import store from './store'
 
 
 axios.defaults.withCredentials = true;

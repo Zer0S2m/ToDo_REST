@@ -13,6 +13,9 @@
 					id="username"
 					required
 				>
+				<div v-if="errorUsername" class="text-danger">
+					<p v-text="errorUsername"></p>
+				</div>
 			</div>
 			<div class="mb-3">
 				<label for="email" class="form-label">Email</label>
@@ -22,6 +25,9 @@
 					class="form-control"
 					id="email"
 				>
+				<div v-if="errorEmail" class="text-danger">
+					<p v-text="errorEmail"></p>
+				</div>
 				<div class="form-text">Email is not required</div>
 			</div>
 			<div class="mb-3">
@@ -31,6 +37,7 @@
 					type="password"
 					class="form-control"
 					id="password"
+					autocomplete="off"
 					required	
 				>
 			</div>
@@ -49,7 +56,9 @@ export default {
 		return {
 			password: "",
 			email: null,
-			username: ""
+			username: "",
+			errorUsername: "",
+			errorEmail: ""
 		}
 	},
 	methods: {
@@ -61,11 +70,17 @@ export default {
 				password: this.password,
 				email: this.email,
 				username: this.username
-			});
+			})
+				.then((res) => {
+					this.errorUsername = "";
+					this.errorEmail = "";
 
-			this.$router.push({
-				name: "UserAuth"
-			});
+					if ( res && res.detail.username ) {
+						this.errorUsername = res.detail.username;
+					} else if ( res && res.detail.email ) {
+						this.errorEmail = res.detail.email;
+					};
+				});
 		}
 	}
 }

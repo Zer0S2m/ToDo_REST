@@ -72,9 +72,9 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 )
 async def create_user(user: UserCreate):
     if await check_email_user_is_db(email = user.email):
-        raise HTTPException(status_code = 400, detail = "Email already registered")
+        raise HTTPException(status_code = 400, detail = {"email": "Email already registered"})
     if await get_user(username = user.username):
-        raise HTTPException(status_code = 400, detail = "Username already registered")
+        raise HTTPException(status_code = 400, detail = {"username": "Username already registered"})
 
     new_user = await create_user_db(user)
     return {

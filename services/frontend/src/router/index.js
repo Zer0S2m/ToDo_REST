@@ -1,10 +1,10 @@
-import Index from '@/components/Index'
-import NoteDetail from '@/components/NoteDetail'
-import UserSignUp from '@/components/UserSignUp'
-import UserAuth from '@/components/UserAuth'
+import Index from '@/views/Index'
+import NoteDetail from '@/views/NoteDetail'
+import UserSignUp from '@/views/UserSignUp'
+import UserAuth from '@/views/UserAuth'
 
 import axios from "axios"
-import store from "@/store/store.js";
+import store from "@/store"
 import {
 	createRouter,
 	createWebHashHistory
@@ -24,11 +24,17 @@ const routes = [
 		path: "/note/",
 		name: 'Index',
 		component: Index,
+		meta: { 
+			requiresAuth: true
+		}
 	},
 	{
 		path: '/note/:id',
 		name: 'NoteDetail',
 		component: NoteDetail,
+		meta: { 
+			requiresAuth: true
+		}
 	},
 	{
 		path: "/user/auth",
@@ -43,10 +49,23 @@ const routes = [
 ]
 
 const router = createRouter({
-	base: process.env.BASE_URL,
   history: createWebHashHistory(),
   routes
-})
+});
+
+router.beforeEach((to, from, next) => {
+  if( to.matched.some(record => record.meta.requiresAuth )) {
+    if ( store.getters.getInLogin ) {
+      next();
+      return;
+    };
+    router.push({
+			name: "UserAuth"
+		});
+  } else {
+    next() ;
+  };
+});
 
 if ( store.getters.getToken ) {
 	router.beforeEach((to, from, next) => {
