@@ -20,6 +20,7 @@ def check_file_is_storage(file_name: str) -> bool:
 
 	return False
 
+
 def create_unique_name_file(file_name: str) -> str:
 	split_file_name = file_name.split(".")
 	_time = str(time.time()).split(".")[0]
@@ -45,3 +46,10 @@ async def writing_file(
 
 def get_pub_date_note(date: datetime) -> str:
 	return f'{date.strftime("%d.%m.%Y")} {date.strftime("%H:%M")}'
+
+
+def create_slug_category(
+	slug: str,
+	user_id: int
+) -> str:
+	return f"{slug}_{user_id}"

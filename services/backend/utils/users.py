@@ -10,8 +10,9 @@ from fastapi import (
     Depends, status, HTTPException
 )
 
-from schemas import UserInDB
-from schemas import TokenData
+from schemas.user import (
+    UserInDB, TokenData
+)
 
 from config import (
     SECRET_KEY, ALGORITHM, oauth2_scheme

@@ -1,13 +1,13 @@
 from fastapi import (
 	APIRouter, HTTPException, UploadFile,
-	Depends
+	Depends, File
 )
-from fastapi import File
 from fastapi.responses import StreamingResponse
 
-from schemas import (
+from schemas.user import UserInDB
+from schemas.note import (
 	NoteSchema, NoteDeleted, NoteEdit,
-	NoteList, NoteCreate
+	NoteList, NoteCreate, 
 )
 
 from utils.db import (
@@ -16,8 +16,6 @@ from utils.db import (
 	get_file, 
 )
 from utils.users import get_current_user
-
-from config import oauth2_scheme
 
 
 router = APIRouter(
@@ -32,8 +30,7 @@ router = APIRouter(
 	response_model = NoteList,
 	response_model_exclude_unset = True,
 )
-async def list_notes(token: str = Depends(oauth2_scheme)):
-	current_user = await get_current_user(token)
+async def list_notes(current_user: UserInDB = Depends(get_current_user)):
 	notes = await get_notes(current_user)
 	return {"notes": notes}
 
@@ -45,9 +42,8 @@ async def list_notes(token: str = Depends(oauth2_scheme)):
 )
 async def get_note_api(
 	note_id: int,
-	token: str = Depends(oauth2_scheme)
+	current_user: UserInDB = Depends(get_current_user)
 ) -> NoteSchema:
-	current_user = await get_current_user(token)
 	note = await get_note(note_id, current_user)
 
 	if not note:
@@ -59,9 +55,8 @@ async def get_note_api(
 @router.delete("/delete")
 async def delete_note(
 	note: NoteDeleted,
-	token: str = Depends(oauth2_scheme)
+	current_user: UserInDB = Depends(get_current_user)
 ):
-	current_user = await get_current_user(token)
 	is_deleted_note = await deleting_note(note, current_user)
 
 	if not is_deleted_note:
@@ -75,9 +70,8 @@ async def delete_note(
 async def edit_note(
 	note: NoteEdit = Depends(),
 	file: UploadFile = File(None),
-	token: str = Depends(oauth2_scheme)
+	current_user: UserInDB = Depends(get_current_user)
 ):
-	current_user = await get_current_user(token)
 	data_file = {}
 	if file:
 		data_file = await set_file_note(file, current_user)
@@ -97,9 +91,8 @@ async def edit_note(
 async def create_note(
 	note: NoteCreate = Depends(),
 	file: UploadFile = File(None),
-	token: str = Depends(oauth2_scheme)
+	current_user: UserInDB = Depends(get_current_user)
 ) -> NoteSchema:
-	current_user = await get_current_user(token)
 	id_file = 0
 	file_name = False
 
@@ -118,9 +111,8 @@ async def create_note(
 )
 async def get_file_api(
 	file_name: str,
-	token: str = Depends(oauth2_scheme)
+	current_user: UserInDB = Depends(get_current_user)
 ):
-	current_user = await get_current_user(token)
 	file = await get_file(file_name, current_user)
 
 	if not file:

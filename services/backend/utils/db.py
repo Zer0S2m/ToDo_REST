@@ -1,5 +1,5 @@
 import os
-from pickle import FALSE
+
 from typing import Union
 from typing import List
 
@@ -9,17 +9,24 @@ from sqlalchemy.future import select
 
 from models import (
 	Note, File, User,
-	Session
+	Category, Session
 )
 
-from schemas import (
+from schemas.user import (
+	UserCreate, UserInDB,
+)
+from schemas.note import (
 	NoteSchema, NoteDeleted, NoteEdit,
-	UserCreate, NoteCreate, UserInDB
+	NoteCreate
+)
+from schemas.category import (
+	CategoryCreate, CategoryList, CategorySchema
 )
 
 from utils.common import (
 	get_pub_date_note, delete_file_storage, check_path_media_dir,
-	writing_file, check_file_is_storage, create_unique_name_file
+	writing_file, check_file_is_storage, create_unique_name_file,
+	create_slug_category
 )
 from utils.password import get_password_hash
 
@@ -277,3 +284,89 @@ async def check_email_user_is_db(
 				return True
 
 	return False
+
+
+async def create_category(
+	category: CategoryCreate,
+	current_user: UserInDB
+) -> Category:
+	async with Session.begin() as session:
+		slug = create_slug_category(category.slug, current_user.user_id)
+		new_category = Category(
+			title = category.title,
+			slug = slug,
+			user_id = current_user.user_id
+		)
+		session.add(new_category)
+		await session.commit()
+
+	return new_category
+
+
+async def get_categories(
+	current_user: UserInDB
+) -> List[CategorySchema]:
+	categories = []
+
+	async with Session.begin() as session:
+		result = await session.execute(
+			select(Category).filter_by(user_id = current_user.user_id)
+		)
+		for category in result.scalars():
+			categories.append(CategorySchema(
+				title = category.title,
+				slug = category.slug,
+			))
+
+	return categories
+
+
+async def get_notes_category(
+	slug: str,
+	current_user: UserInDB
+) -> List[NoteSchema]:
+	notes = []
+	category = await get_category(slug, current_user)
+
+	async with Session.begin() as session:
+		result = await session.execute(
+			select(Note).filter_by(user_id = current_user.user_id, category_id = category.id)
+		)
+		for note in result.scalars():
+			file_name = await get_file_name(session, note.id_file)
+			notes.append(NoteSchema(
+				titleNote = note.title,
+				textNote = note.text,
+				idNote = note.id,
+				pubDate = get_pub_date_note(note.pub_date),
+				fileName = file_name
+			))
+
+	return notes
+
+
+async def get_category(
+	slug: str,
+	current_user: UserInDB
+) -> Category:
+	async with Session.begin() as session:
+		category = await session.execute(
+			select(Category).filter_by(slug = slug, user_id = current_user.user_id)
+		)
+		category = category.scalars().first()
+
+	return category
+
+
+async def delete_category(
+	slug: str,
+	current_user: UserInDB
+):
+	async with Session.begin() as session:
+		deleted_category = await session.execute(
+			select(Category).filter_by(slug = slug, user_id = current_user.user_id)
+		)
+		deleted_category = deleted_category.scalars().first()
+		if deleted_category:
+			await session.delete(deleted_category)
+			await session.commit()

@@ -1,5 +1,4 @@
 from datetime import datetime
-from enum import unique
 
 from sqlalchemy import (
 	Column, Integer, String,
@@ -36,6 +35,7 @@ class Note(Base):
     file = relationship("File", backref = "note_file", cascade = "all, delete")
     id_file = Column(Integer, ForeignKey('file.id', ondelete = "CASCADE"), default = False)
     user_id = Column(Integer, ForeignKey('user.id'))
+    category_id = Column(Integer, ForeignKey('category.id', ondelete = "CASCADE"), nullable = True, default = None)
 
 
     def __repr__(self) -> str:
@@ -55,6 +55,19 @@ class File(Base):
         return f"<id: {self.id}> - <title: {self.file_name}>"
 
 
+class Category(Base):
+    __tablename__ = "category"
+
+    id = Column(Integer, primary_key = True, unique = True)
+    title = Column(String, nullable = False)
+    slug = Column(String, unique = True, nullable = False)
+    user_id = Column(Integer, ForeignKey('user.id'))
+
+
+    def __repr__(self) -> str:
+        return f"<title: {self.title}> - <slug: {self.slug}>"
+
+
 class User(Base):
     __tablename__ = "user"
 
@@ -64,6 +77,7 @@ class User(Base):
     email = Column(String, nullable = True)
     notes = relationship("Note", backref = "user_notes", cascade = "all, delete")
     files = relationship("File", backref = "user_files", cascade = "all, delete")
+    categories = relationship("Category", backref = "user_categories", cascade = "all, delete")
 
 
     def __repr__(self) -> str:

@@ -1,8 +1,3 @@
-from schemas.note import (
-    NoteSchema, NoteDeleted, NoteEdit,
-    NoteList, NoteCreate
-)
-from schemas.user import (
-    User, UserInDB, Token,
-    TokenData, UserCreate 
-)
+from schemas import note
+from schemas import user
+from schemas import category

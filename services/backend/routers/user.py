@@ -6,7 +6,7 @@ from fastapi import (
 )
 from fastapi.security import OAuth2PasswordRequestForm
 
-from schemas import (
+from schemas.user import (
     User, UserCreate, Token
 )
 
@@ -61,8 +61,8 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
 
     return {
-        "accessToken": access_token,
-        "tokenType": "bearer"
+        "access_token": access_token,
+        "token_type": "bearer"
     }
 
 
