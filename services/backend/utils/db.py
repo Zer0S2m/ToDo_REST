@@ -24,9 +24,9 @@ from schemas.category import (
 )
 
 from utils.common import (
-	get_pub_date_note, delete_file_storage, check_path_media_dir,
+	create_note_schema, delete_file_storage, check_path_media_dir,
 	writing_file, check_file_is_storage, create_unique_name_file,
-	create_slug_category
+	create_slug_category, 
 )
 from utils.password import get_password_hash
 
@@ -44,13 +44,7 @@ async def get_notes(
 		)
 		for note in result.scalars():
 			file_name = await get_file_name(session, note.id_file)
-			notes.append(NoteSchema(
-				titleNote = note.title,
-				textNote = note.text,
-				idNote = note.id,
-				pubDate = get_pub_date_note(note.pub_date),
-				fileName = file_name
-			))
+			notes.append(create_note_schema(note, file_name))
 
 	return notes
 
@@ -62,19 +56,13 @@ async def get_note(
 	note = None
 
 	async with Session.begin() as session:
-		result = await session.execute(
+		note = await session.execute(
 			select(Note).filter_by(id = note_id, user_id = current_user.user_id)
 		)
-		result = result.scalars().first()
-		if result:
-			file_name = await get_file_name(session, result.id_file)
-			note = NoteSchema(
-				idNote = result.id,
-				titleNote = result.title,
-				textNote = result.text,
-				pubDate = get_pub_date_note(date = result.pub_date),
-				fileName = file_name
-			)
+		note = note.scalars().first()
+		if note:
+			file_name = await get_file_name(session, note.id_file)
+			note = create_note_schema(note, file_name)
 
 	return note
 
@@ -97,53 +85,24 @@ async def creating_note(
 
 		session.add(new_note)
 
-	return NoteSchema(
-		titleNote = note.title,
-		textNote = note.text,
-		pubDate = get_pub_date_note(date = note.pub_date),
-		idNote = new_note.id,
-		fileName = file_name
-	)
-
-
-async def creating_file_note(
-	file_path: str,
-	file_name: str,
-	current_user: UserInDB
-) -> int:
-	async with Session.begin() as session:
-		new_file = File(
-			file_path = file_path,
-			file_name = file_name,
-			user_id = current_user.user_id
-		)
-		session.add(new_file)
-		await session.commit()
-
-	return new_file.id
+	return create_note_schema(new_note, file_name)
 
 
 async def deleting_note(
 	note: NoteDeleted,
 	current_user: UserInDB
-) -> bool:
+):
 	async with Session() as session:
 		result = await session.execute(
 			select(Note).filter_by(id = note.id, user_id = current_user.user_id)
 		)
-
 		deleted_note = result.scalars().first()
-		if deleted_note:
-			file_name = await get_file_name(session, deleted_note.id_file)
+		file_name = await get_file_name(session, deleted_note.id_file)
 
-			await delete_file_storage(file_name)
+		await delete_file_storage(file_name)
 
-			await session.delete(deleted_note)
-			await session.commit()
-
-			return True
-		else:
-			return False
+		await session.delete(deleted_note)
+		await session.commit()
 
 
 async def editing_note(
@@ -165,6 +124,7 @@ async def editing_note(
 			await deleting_file_db(session, note.file_name)
 
 			note_edit.id_file = data_file["id_file"]
+			note.file_name = data_file["file_name"]
 
 		note_edit.title = note.title
 		note_edit.text = note.text
@@ -199,6 +159,23 @@ async def get_file(
 		file = file.scalars().first()
 
 	return file
+
+
+async def creating_file_note(
+	file_path: str,
+	file_name: str,
+	current_user: UserInDB
+) -> int:
+	async with Session.begin() as session:
+		new_file = File(
+			file_path = file_path,
+			file_name = file_name,
+			user_id = current_user.user_id
+		)
+		session.add(new_file)
+		await session.commit()
+
+	return new_file.id
 
 
 async def get_file_name(
@@ -279,7 +256,6 @@ async def check_email_user_is_db(
 				select(User).filter_by(email = email)
 			)
 			user = user.scalars().first()
-
 			if user:
 				return True
 
@@ -334,13 +310,7 @@ async def get_notes_category(
 		)
 		for note in result.scalars():
 			file_name = await get_file_name(session, note.id_file)
-			notes.append(NoteSchema(
-				titleNote = note.title,
-				textNote = note.text,
-				idNote = note.id,
-				pubDate = get_pub_date_note(note.pub_date),
-				fileName = file_name
-			))
+			notes.append(create_note_schema(note, file_name))
 
 	return notes
 

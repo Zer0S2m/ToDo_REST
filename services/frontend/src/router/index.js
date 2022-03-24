@@ -81,7 +81,9 @@ if ( store.getters.getToken ) {
 				next();
 			})
 			.catch((error) => {
-				console.error(error);
+				router.push({
+					name: "UserAuth"
+				});
 			});
 		} else {
 			next();

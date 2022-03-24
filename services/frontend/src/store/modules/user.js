@@ -26,11 +26,11 @@ export default {
 			await axios.post("/user/auth", formData)
 				.then((res) => { 
 					const data = res.data;
-					localStorage.setItem('token', data.accessToken);
+					localStorage.setItem('token', data.access_token);
 
-					axios.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
+					axios.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`;
 
-					state.commit("setToken", data.accessToken);
+					state.commit("setToken", data.access_token);
 					state.dispatch("getNotes");
 
 					router.push({

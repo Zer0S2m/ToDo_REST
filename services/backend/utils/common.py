@@ -8,6 +8,10 @@ from fastapi import UploadFile
 
 from config import MEDIA_DIR
 
+from models import Note
+
+from schemas.note import NoteSchema
+
 
 def check_path_media_dir():
 	if not os.path.isdir(MEDIA_DIR):
@@ -53,3 +57,16 @@ def create_slug_category(
 	user_id: int
 ) -> str:
 	return f"{slug}_{user_id}"
+
+
+def create_note_schema(
+	note: Note,
+	file_name: str
+) -> NoteSchema:
+	return NoteSchema(
+        titleNote = note.title,
+        textNote = note.text,
+        idNote = note.id,
+        pubDate = get_pub_date_note(note.pub_date),
+        fileName = file_name
+    )

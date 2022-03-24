@@ -10,6 +10,8 @@ from schemas.note import (
 	NoteList, NoteCreate, 
 )
 
+from models import Note
+
 from utils.db import (
 	get_notes, get_note, deleting_note,
 	editing_note, creating_note, set_file_note,
@@ -23,6 +25,16 @@ router = APIRouter(
 	tags = ["note"],
 	responses = {404: {"description": "Not found"}},
 )
+
+
+async def check_is_note_in_db(
+	note_id: int,
+	current_user: UserInDB
+) -> Note:
+	note = await get_note(note_id, current_user)
+	if not note:
+		raise HTTPException(status_code = 404, detail = "Note not found")
+	return note
 
 
 @router.get(
@@ -44,11 +56,7 @@ async def get_note_api(
 	note_id: int,
 	current_user: UserInDB = Depends(get_current_user)
 ) -> NoteSchema:
-	note = await get_note(note_id, current_user)
-
-	if not note:
-		raise HTTPException(status_code = 404, detail = "Note not found")
-
+	note = await check_is_note_in_db(note_id, current_user)
 	return note
 
 
@@ -57,10 +65,8 @@ async def delete_note(
 	note: NoteDeleted,
 	current_user: UserInDB = Depends(get_current_user)
 ):
-	is_deleted_note = await deleting_note(note, current_user)
-
-	if not is_deleted_note:
-		raise HTTPException(status_code = 404, detail = "Note not found")
+	await check_is_note_in_db(note.id, current_user)
+	await deleting_note(note, current_user)
 
 
 @router.put(
@@ -72,15 +78,13 @@ async def edit_note(
 	file: UploadFile = File(None),
 	current_user: UserInDB = Depends(get_current_user)
 ):
+	await check_is_note_in_db(note.id, current_user)
+
 	data_file = {}
 	if file:
 		data_file = await set_file_note(file, current_user)
 
 	note = await editing_note(note, data_file, current_user)
-
-	if data_file:
-		note.file_name = data_file["file_name"]
-
 	return note
 
 
@@ -98,7 +102,6 @@ async def create_note(
 
 	if file:
 		data_file = await set_file_note(file, current_user)
-
 		id_file = data_file["id_file"]
 		file_name = data_file["file_name"]
 
@@ -114,7 +117,6 @@ async def get_file_api(
 	current_user: UserInDB = Depends(get_current_user)
 ):
 	file = await get_file(file_name, current_user)
-
 	if not file:
 		raise HTTPException(status_code = 404, detail = "File not found")
 

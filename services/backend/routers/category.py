@@ -24,6 +24,15 @@ router = APIRouter(
 )
 
 
+async def check_is_category_in_db(
+    slug: str,
+    current_user: UserInDB
+):
+    category = await get_category(slug, current_user)
+    if not category:
+        raise HTTPException(status_code = 404, detail = "Note not found")
+
+
 @router.get(
     "/",
     response_model = CategoryList
@@ -39,11 +48,9 @@ async def category_list(current_user: UserInDB = Depends(get_current_user)):
 )
 async def get_category_notes(
     slug: str,
-    current_user: UserInDB = Depends(get_current_user)
+    current_user: UserInDB = Depends(get_current_user),
 ):
-    category = await get_category(slug, current_user)
-    if not category:
-        raise HTTPException(status_code = 404, detail = "Note not found")
+    await check_is_category_in_db(slug, current_user)
 
     notes = await get_notes_category(slug, current_user)
     return {"notes": notes}
@@ -58,9 +65,7 @@ async def category_create(
     current_user: UserInDB = Depends(get_current_user)
 ):
     slug = create_slug_category(category.slug, current_user.user_id)
-    category = await get_category(slug, current_user)
-    if category:
-        raise HTTPException(status_code = 400, detail = {"category": "Category slug already exists"})
+    await check_is_category_in_db(slug, current_user)
 
     new_category = await create_category(category, current_user)
     return {
@@ -76,8 +81,5 @@ async def category_delete(
     category: CategoryDelete,
     current_user: UserInDB = Depends(get_current_user)
 ):
-    is_category = await get_category(category.slug, current_user)
-    if not is_category:
-        raise HTTPException(status_code = 400, detail = {"description": "Not found"})
-
+    await check_is_category_in_db(category.slug, current_user)
     await delete_category(category.slug, current_user)
