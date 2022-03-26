@@ -28,9 +28,9 @@ async def check_is_category_in_db(
     slug: str,
     current_user: UserInDB
 ):
-    category = await get_category(slug, current_user)
+    category = await get_category(current_user, slug = slug)
     if not category:
-        raise HTTPException(status_code = 404, detail = "Note not found")
+        raise HTTPException(status_code = 404, detail = "Category not found")
 
 
 @router.get(
@@ -65,7 +65,9 @@ async def category_create(
     current_user: UserInDB = Depends(get_current_user)
 ):
     slug = create_slug_category(category.slug, current_user.user_id)
-    await check_is_category_in_db(slug, current_user)
+    category_in_db = await get_category(current_user, slug = slug)
+    if category_in_db:
+        raise HTTPException(status_code = 400, detail = "Category already exists")
 
     new_category = await create_category(category, current_user)
     return {

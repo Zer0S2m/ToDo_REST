@@ -32,6 +32,7 @@ export default {
 
 					state.commit("setToken", data.access_token);
 					state.dispatch("getNotes");
+					state.dispatch("getCategories");
 
 					router.push({
 						name: "Index"

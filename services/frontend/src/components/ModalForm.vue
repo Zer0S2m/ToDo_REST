@@ -31,6 +31,19 @@
 						></textarea>
 					</div>
 					<div class="mb-3">
+						<label for="category-note" class="form-label">Category</label>
+						<select class="form-select" id="category-note" v-model="categorySlug">
+							<option value="" selected>Select a category</option>
+							<option
+								v-for="category in getCategories" :key="category.id"
+								:value="category.slug"
+							>
+								{{ category.title }}
+							</option>
+						</select>
+						<div class="form-text">Category is not required</div>
+					</div>
+					<div class="mb-3">
 						<label for="formFileMultiple" class="form-label">Attach file</label>
 						<input
 							class="form-control"
@@ -67,6 +80,7 @@ export default {
 			titleNote: "",
 			textNote: "",
 			file: "",
+			categorySlug: ""
 		}
 	},
 	methods: {
@@ -82,11 +96,11 @@ export default {
 			if ( !this.textNote ) {
 				return;
 			};
-
 			const data = {
-				'file': this.file,
-				"titleNote": this.titleNote,
-				"textNote": this.textNote
+				file: this.file,
+				titleNote: this.titleNote,
+				textNote: this.textNote,
+				categorySlug: this.categorySlug
 			};
 
 			const actionForm = this.getActionForm;
@@ -109,6 +123,7 @@ export default {
 			this.titleNote = "";
 			this.textNote = "";
 			this.file = "";
+			this.categorySlug = "";
 		},
 	},
 	computed: {
@@ -117,6 +132,7 @@ export default {
 			"getActionForm",
 			"getNotes",
 			"getNote",
+			"getCategories"
 		])
 	},
 }

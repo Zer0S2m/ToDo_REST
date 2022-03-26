@@ -2,6 +2,7 @@
 	<div id="app">
 		<NavBar />
 		<ModalForm />
+		<CategoryForm />
 		<h1 class="text-center mb-5">ToDo FastAPI/Python & VueJS</h1>
 		<div class="container text-start w-50">
 			<router-view/>
@@ -12,13 +13,15 @@
 <script>
 import NavBar from "./components/NavBar";
 import ModalForm from "./components/ModalForm";
+import CategoryForm from "./components/CategoryForm";
 
 
 export default {
 	name: 'App',
 	components: {
 		NavBar,
-		ModalForm
+		ModalForm,
+		CategoryForm
 	},
 }
 </script>

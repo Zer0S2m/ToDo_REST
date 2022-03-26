@@ -1,6 +1,7 @@
 import os
 import time
 from datetime import datetime
+from typing import Union
 
 import aiofiles
 
@@ -61,12 +62,14 @@ def create_slug_category(
 
 def create_note_schema(
 	note: Note,
-	file_name: str
+	file_name: str,
+	category_slug: Union[str, None] = None
 ) -> NoteSchema:
 	return NoteSchema(
         titleNote = note.title,
         textNote = note.text,
         idNote = note.id,
         pubDate = get_pub_date_note(note.pub_date),
-        fileName = file_name
+        fileName = file_name,
+		categorySlug = category_slug
     )

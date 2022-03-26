@@ -20,7 +20,7 @@ from schemas.note import (
 	NoteCreate
 )
 from schemas.category import (
-	CategoryCreate, CategoryList, CategorySchema
+	CategoryCreate, CategorySchema
 )
 
 from utils.common import (
@@ -43,8 +43,11 @@ async def get_notes(
 			select(Note).filter_by(user_id = current_user.user_id)
 		)
 		for note in result.scalars():
+			category_slug = await get_category(current_user, category_id = note.category_id)
+			if category_slug:
+				category_slug = category_slug.slug
 			file_name = await get_file_name(session, note.id_file)
-			notes.append(create_note_schema(note, file_name))
+			notes.append(create_note_schema(note, file_name, category_slug))
 
 	return notes
 
@@ -53,16 +56,17 @@ async def get_note(
 	note_id: int,
 	current_user: UserInDB
 ) -> Union[None, NoteSchema]:
-	note = None
-
 	async with Session.begin() as session:
 		note = await session.execute(
 			select(Note).filter_by(id = note_id, user_id = current_user.user_id)
 		)
 		note = note.scalars().first()
 		if note:
+			category_slug = await get_category(current_user, category_id = note.category_id)
+			if category_slug:
+				category_slug = category_slug.slug
 			file_name = await get_file_name(session, note.id_file)
-			note = create_note_schema(note, file_name)
+			note = create_note_schema(note, file_name, category_slug)
 
 	return note
 
@@ -74,6 +78,7 @@ async def creating_note(
 	current_user: UserInDB
 ) -> NoteSchema:
 	async with Session.begin() as session:
+		category_slug = None
 		new_note = Note(
 			title = note.title,
 			text = note.text,
@@ -82,10 +87,14 @@ async def creating_note(
 		)
 		if id_file:
 			new_note.id_file = id_file
+		if note.category_slug:
+			category = await get_category(current_user, slug = note.category_slug)
+			new_note.category_id = category.id
+			category_slug = category.slug
 
 		session.add(new_note)
 
-	return create_note_schema(new_note, file_name)
+	return create_note_schema(new_note, file_name, category_slug)
 
 
 async def deleting_note(
@@ -116,8 +125,12 @@ async def editing_note(
 		)
 		note_edit = note_edit.scalars().first()
 
-		if not note.title:
-			note.title = None
+		if note.category_slug:
+			category = await get_category(current_user, slug = note.category_slug)
+			category_id = category.id
+			note_edit.category_id = category_id
+		else:
+			note_edit.category_id = 0
 
 		if data_file:
 			await delete_file_storage(note.file_name)
@@ -302,29 +315,39 @@ async def get_notes_category(
 	current_user: UserInDB
 ) -> List[NoteSchema]:
 	notes = []
-	category = await get_category(slug, current_user)
+	category = await get_category(current_user, slug = slug)
 
 	async with Session.begin() as session:
 		result = await session.execute(
 			select(Note).filter_by(user_id = current_user.user_id, category_id = category.id)
 		)
 		for note in result.scalars():
+			if category:
+				category_slug = category.slug
 			file_name = await get_file_name(session, note.id_file)
-			notes.append(create_note_schema(note, file_name))
+			notes.append(create_note_schema(note, file_name, category_slug))
 
 	return notes
 
 
 async def get_category(
-	slug: str,
-	current_user: UserInDB
-) -> Category:
+	current_user: UserInDB,
+	category_id: Union[int, None] = None,
+	slug: Union[str, None] = None,
+) -> Union[Category, None]:
+	category = None
 	async with Session.begin() as session:
-		category = await session.execute(
-			select(Category).filter_by(slug = slug, user_id = current_user.user_id)
-		)
-		category = category.scalars().first()
+		if slug:
+			category = await session.execute(
+				select(Category).filter_by(slug = slug, user_id = current_user.user_id)
+			)
+		elif category_id:
+			category = await session.execute(
+				select(Category).filter_by(id = category_id, user_id = current_user.user_id)
+			)
 
+	if category:
+		category = category.scalars().first()
 	return category
 
 

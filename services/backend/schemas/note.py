@@ -12,6 +12,7 @@ class BaseNote(BaseModel):
     title: Optional[str] = Field(None, alias = "titleNote")
     text: Optional[str] = Field(alias = "textNote")
     pub_date: Union[datetime, str] = Field(alias = "pubDate", default = datetime.now())
+    category_slug: Optional[str] = Field(None, alias = "categorySlug")
 
 
 class NoteSchema(BaseNote):

@@ -2,13 +2,22 @@
 	<header class="mb-4">
 		<nav class="navbar navbar-light bg-light">
 			<div class="container-fluid container">
-				<router-link
-					:to="{ name: 'Index' }"
-					class="navbar-link"
-				>
-					<img src="@/assets/logo.png" alt="" width="30" height="24" class="d-inline-block align-text-top">
-					<span>ToDo</span>
-				</router-link>
+				<div class="d-flex">
+					<router-link
+						:to="{ name: 'Index' }"
+						class="navbar-link me-3"
+					>
+						<img src="@/assets/logo.png" alt="" width="30" height="24" class="d-inline-block align-text-top">
+						<span>ToDo</span>
+					</router-link>
+					<router-link
+						v-if="getInLogin"
+						:to="{ name: 'ListCategories' }"
+						class="link"
+					>
+						<span>Categoires</span>
+					</router-link>
+				</div>
 				<div>
 					<router-link
 						:to="{ name: 'UserAuth' }"
@@ -26,7 +35,15 @@
 					</router-link>
 					<button
 						v-if="getInLogin"
-						@click="openModal"
+						@click="openFormCategory"
+						type="button"
+						class="btn btn-primary me-2"
+					>
+  					Add Category
+					</button>
+					<button
+						v-if="getInLogin"
+						@click="openFormNote"
 						type="button"
 						class="btn btn-primary me-2"
 					>
@@ -64,15 +81,19 @@ export default {
 	methods: {
 		...mapMutations([
 			"setShowModalForm",
-			"setActionForFormNote"
+			"setActionForFormNote",
+			"setShowFormCategory"
 		]),
 		...mapActions([
 			"logoutUser"
 		]),
-		openModal() {
+		openFormNote() {
 			this.setShowModalForm(true);
 			this.setActionForFormNote("create");
 		},
+		openFormCategory() {
+			this.setShowFormCategory(true);
+		}
 	},
 	computed: {
 		...mapGetters([

@@ -27,6 +27,7 @@ export default {
 
 			editNote.titleNote = data.titleNote;
 			editNote.textNote = data.textNote;
+			editNote.categorySlug = data.categorySlug;
 			if ( data.fileName ) editNote.fileName = data.fileName;
 		},
 		setNotes(state, notes) {
@@ -37,6 +38,11 @@ export default {
 				const note = state.notes[i];
 				note.id -= 1;
 			};
+		},
+		deleteCategoryInNotes(state, categorySlug) {
+			state.notes.map((note) => {
+				if ( note.categorySlug === categorySlug ) note.categorySlug = null;
+			});
 		}
 	},
 	actions: {
@@ -103,6 +109,7 @@ export default {
 			axios.post("/note/create", dataFile, {params: {
 				titleNote: data.titleNote,
 				textNote: data.textNote,
+				categorySlug: data.categorySlug
 			}})
 			.then((res) => {
 				const note = res.data;
@@ -126,6 +133,7 @@ export default {
 					"titleNote": data.titleNote,
 					"textNote": data.textNote,
 					"fileName": data.note.fileName,
+					"categorySlug": data.categorySlug,
 			}})
 			.then((res) => {
 				data.fileName = res.data.fileName;
@@ -148,6 +156,9 @@ export default {
 		},
 		getActionForm(state) {
 			return state.actionForm;
+		},
+		getNotesCategory: (state) => (slug) => {
+			return state.notes.filter(note => note.categorySlug === slug);
 		}
 	},
 }
