@@ -3,6 +3,8 @@ import os
 from typing import Union
 from typing import List
 
+from datetime import datetime
+
 from fastapi import UploadFile
 
 from sqlalchemy.future import select
@@ -82,7 +84,7 @@ async def creating_note(
 		new_note = Note(
 			title = note.title,
 			text = note.text,
-			pub_date = note.pub_date,
+			pub_date = datetime.now(),
 			user_id = current_user.user_id
 		)
 		if id_file:

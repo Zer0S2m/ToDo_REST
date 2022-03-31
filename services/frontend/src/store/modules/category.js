@@ -54,6 +54,9 @@ export default {
 			.then((res) => {
 				state.commit("setCategories", res.data.categories)
 			})
+			.catch((error) => {
+				state.dispatch("logoutUser");
+			});
 		},
 	},
 	getters: {

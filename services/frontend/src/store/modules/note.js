@@ -76,11 +76,11 @@ export default {
 					for ( let i = 0; i < values.length; i++ ) {
 						values[i].id = i;
 					};
-		
+
 					state.dispatch("setNotes", values);
 				})
 				.catch((error) => {
-					console.error(error);
+					state.dispatch("logoutUser");
 				});
 		},
 		getNote: async function(state, id) {

@@ -85,34 +85,5 @@ router.beforeEach((to, from, next) => {
   };
 });
 
-if ( store.getters.getToken ) {
-	router.beforeEach((to, from, next) => {
-		const lengthNotes = store.getters.getNotes.length;
-		const lengthCategoires = store.getters.getCategories;
-
-		if ( !lengthNotes ) {
-			axios.get("/note")
-			.then((res) => {
-				const values = Object.values(res.data.notes);
-				for ( let i = 0; i < values.length; i++ ) {
-					values[i].id = i;
-				};
-
-				store.dispatch("setNotes", values);
-				next();
-			})
-		}
-		if ( !lengthCategoires ) {
-			axios.get("/category")
-			.then((res) => {
-				store.commit("setCategories", res.data.categories);
-			})
-		};
-
-		if ( lengthNotes && lengthCategoires ) {
-			next();
-		};
-	});
-};
 
 export default router
