@@ -71,5 +71,6 @@ def create_note_schema(
         idNote = note.id,
         pubDate = get_pub_date_note(note.pub_date),
         fileName = file_name,
-		categorySlug = category_slug
+		categorySlug = category_slug,
+		importance = note.importance
     )

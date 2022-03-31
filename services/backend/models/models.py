@@ -1,3 +1,4 @@
+from email.policy import default
 from sqlalchemy import (
 	Column, Integer, String,
 	DateTime, Text, ForeignKey
@@ -30,6 +31,7 @@ class Note(Base):
     title = Column(String(LIMIT_TITLE), default = False)
     text = Column(Text(LIMIT_TEXT), nullable = False)
     pub_date = Column(DateTime)
+    importance = Column(Integer, default = 0)
     file = relationship("File", backref = "note_file", cascade = "all, delete")
     id_file = Column(Integer, ForeignKey('file.id', ondelete = "CASCADE"), default = False)
     user_id = Column(Integer, ForeignKey('user.id'))

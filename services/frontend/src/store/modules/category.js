@@ -69,5 +69,8 @@ export default {
 		getCategory: (state) => (slug) => {
 			return state.categories.indexOf(state.categories.find(category => category.slug === slug));
 		},
+		getCategoryTitle: (state) => (slug) => {
+			return state.categories.find(category => category.slug === slug).title;
+		}
 	}
 }

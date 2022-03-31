@@ -66,7 +66,8 @@ export default {
 		},
 		logoutUser: function(state) {
 			state.commit('clearUser');
-			state.dispatch("setNotes", []);
+			state.commit("setNotes", []);
+			state.commit("setCategories", []);
 			localStorage.removeItem('token');
 			delete axios.defaults.headers.common['Authorization'];
 

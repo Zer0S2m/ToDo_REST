@@ -28,6 +28,7 @@ export default {
 			editNote.titleNote = data.titleNote;
 			editNote.textNote = data.textNote;
 			editNote.categorySlug = data.categorySlug;
+			editNote.importance = data.importance;
 			if ( data.fileName ) editNote.fileName = data.fileName;
 		},
 		setNotes(state, notes) {
@@ -46,9 +47,6 @@ export default {
 		}
 	},
 	actions: {
-		setNotes(state, notes) {
-			state.commit("setNotes", notes);
-		},
 		deleteNote: function(state, id) {
 			const idNote = state.getters.getNote(id).idNote;
 
@@ -77,7 +75,7 @@ export default {
 						values[i].id = i;
 					};
 
-					state.dispatch("setNotes", values);
+					state.commit("setNotes", values);
 				})
 				.catch((error) => {
 					state.dispatch("logoutUser");
@@ -109,7 +107,8 @@ export default {
 			axios.post("/note/create", dataFile, {params: {
 				titleNote: data.titleNote,
 				textNote: data.textNote,
-				categorySlug: data.categorySlug
+				categorySlug: data.categorySlug,
+				importance: data.importance
 			}})
 			.then((res) => {
 				const note = res.data;
@@ -134,6 +133,7 @@ export default {
 					"textNote": data.textNote,
 					"fileName": data.note.fileName,
 					"categorySlug": data.categorySlug,
+					"importance": data.importance
 			}})
 			.then((res) => {
 				data.fileName = res.data.fileName;

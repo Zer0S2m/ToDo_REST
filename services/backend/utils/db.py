@@ -85,7 +85,8 @@ async def creating_note(
 			title = note.title,
 			text = note.text,
 			pub_date = datetime.now(),
-			user_id = current_user.user_id
+			user_id = current_user.user_id,
+			importance = note.importance
 		)
 		if id_file:
 			new_note.id_file = id_file
@@ -133,6 +134,11 @@ async def editing_note(
 			note_edit.category_id = category_id
 		else:
 			note_edit.category_id = 0
+
+		if note.importance == None:
+			note_edit.importance = 0
+		elif int(note.importance) != 0:
+			note_edit.importance = note.importance
 
 		if data_file:
 			await delete_file_storage(note.file_name)

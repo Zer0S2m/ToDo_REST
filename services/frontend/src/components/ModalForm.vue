@@ -44,6 +44,39 @@
 						<div class="form-text">Category is not required</div>
 					</div>
 					<div class="mb-3">
+						<label for="" class="form-label">Degree of importance</label>
+						<div class="d-flex align-items-center justify-content-around">
+							<input
+								class="d-flex align-items-center justify-content-center importance-radio importance-radio-1"
+								name="importance-note"
+								type="radio"
+								label="!"
+								value="1"
+								v-model="importance"
+								@click="checkIsInputRadio"
+							>
+							<input
+								class="d-flex align-items-center justify-content-center importance-radio importance-radio-2"
+								name="importance-note"
+								type="radio"
+								label="!!"
+								value="2"
+								v-model="importance"
+								@click="checkIsInputRadio"
+							>
+							<input
+								class="d-flex align-items-center justify-content-center importance-radio importance-radio-3"
+								name="importance-note"
+								type="radio"
+								label="!!!"
+								value="3"
+								v-model="importance"
+								@click="checkIsInputRadio"
+							>
+						</div>
+						<div class="form-text">Importance is not required</div>
+					</div>
+					<div class="mb-3">
 						<label for="formFileMultiple" class="form-label">Attach file</label>
 						<input
 							class="form-control"
@@ -80,7 +113,8 @@ export default {
 			titleNote: "",
 			textNote: "",
 			file: "",
-			categorySlug: ""
+			categorySlug: "",
+			importance: 0
 		}
 	},
 	methods: {
@@ -100,7 +134,8 @@ export default {
 				file: this.file,
 				titleNote: this.titleNote,
 				textNote: this.textNote,
-				categorySlug: this.categorySlug
+				categorySlug: this.categorySlug,
+				importance: this.importance
 			};
 
 			const actionForm = this.getActionForm;
@@ -116,6 +151,12 @@ export default {
 		uploadFile() {
 			this.file = this.$refs.file.files[0];
 		},
+		checkIsInputRadio() {
+			if ( parseInt(this.importance) === parseInt(event.currentTarget.value) ) {
+				event.currentTarget.checked = false;
+				this.importance = 0;
+			};
+		},
 		closeModal() {
 			this.setShowModalForm(false);
 			this.setActionForFormNote(false);
@@ -124,6 +165,7 @@ export default {
 			this.textNote = "";
 			this.file = "";
 			this.categorySlug = "";
+			this.importance = 0;
 		},
 	},
 	computed: {
@@ -141,5 +183,34 @@ export default {
 <style scoped>
 #exampleModal {
 	background-color: rgba(0, 0, 0, 0.5);
+}
+
+.importance-radio {
+	width: 100%;
+	max-width: 40px;
+  height: 40px;
+  appearance: none;
+  outline: 0;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+	color: #ffffff;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+}
+.importance-radio::before {
+	content: attr(label);
+}
+.importance-radio:checked {
+	max-width: 100px;
+}
+.importance-radio.importance-radio-1 {
+	background-color: rgba(110, 219, 128, 1);
+}
+.importance-radio.importance-radio-2 {
+	background-color: rgba(247, 189, 64, 1);
+}
+.importance-radio.importance-radio-3 {
+	background-color: rgba(224, 35, 41, 1);
 }
 </style>
