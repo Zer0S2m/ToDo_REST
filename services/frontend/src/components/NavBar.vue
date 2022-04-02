@@ -4,7 +4,7 @@
 			<div class="container-fluid container">
 				<div class="d-flex">
 					<router-link
-						:to="{ name: 'Index' }"
+						:to="{ name: 'ListNotes' }"
 						class="navbar-link me-3"
 					>
 						<img src="@/assets/logo.png" alt="" width="30" height="24" class="d-inline-block align-text-top">

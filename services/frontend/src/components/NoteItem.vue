@@ -1,15 +1,19 @@
 <template>
-	<div>
+	<div class="col-4 mb-4">
 		<router-link
 			:to="{ name: 'NoteDetail', params: { id: note.id } }"
 			class="list-group-item list-group-item-action"
 			:class="classImportance"
 		>
-			<div class="d-flex w-100 justify-content-between">
+			<div>
 				<h5 class="mb-1">{{ note.titleNote }}</h5>
-				<small>{{ note.pubDate }}</small>
+				<p class="mb-0">{{ note.textNote }}</p>
 			</div>
-			<p class="mb-1">{{ note.textNote }}</p>
+			<p class="mb-0 mt-2">
+				<small>
+					<time>{{ note.pubDate }}</time>
+				</small>
+			</p>
 		</router-link>
 	</div>
 </template>

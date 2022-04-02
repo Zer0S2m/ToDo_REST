@@ -1,11 +1,10 @@
-import Index from '@/views/Index'
+import ListNotes from '@/views/ListNotes'
 import NoteDetail from '@/views/NoteDetail'
 import UserSignUp from '@/views/UserSignUp'
 import UserAuth from '@/views/UserAuth'
 import ListCategories from '@/views/ListCategories'
 import CategoryDetail from '@/views/CategoryDetail'
 
-import axios from "axios"
 import store from "@/store"
 import {
 	createRouter,
@@ -18,14 +17,14 @@ const routes = [
 		path: '/',
 		redirect: to => {
 			return {
-				name: "Index"
+				name: "ListNotes"
 			};
 		}
 	},
 	{
 		path: "/note/",
-		name: 'Index',
-		component: Index,
+		name: 'ListNotes',
+		component: ListNotes,
 		meta: { 
 			requiresAuth: true
 		}

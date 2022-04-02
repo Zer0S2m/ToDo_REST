@@ -1,17 +1,19 @@
 <template>
-	<div class="list-group">
-		<NoteItem
-			v-for="note in getNotesCategory(this.$route.params.slug)" :key="note.id"
-			:note="note"
-		>
-		</NoteItem>
+	<div class="w-75 mx-auto">
+		<div class="row">
+			<NoteItem
+				v-for="note in getNotesCategory(this.$route.params.slug)" :key="note.id"
+				:note="note"
+			>
+			</NoteItem>
+		</div>
 	</div>
 </template>
 
 <script>
-import NoteItem from "@/components/NoteItem";
-
 import { mapGetters } from "vuex";
+
+import NoteItem from "@/components/NoteItem";
 
 
 export default {

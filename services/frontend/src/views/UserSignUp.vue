@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="w-50 mx-auto">
 		<h2 class="text-center">Registration</h2>
 		<form
 			@submit.prevent=submit

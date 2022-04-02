@@ -4,8 +4,8 @@
 		<ModalForm />
 		<CategoryForm />
 		<h1 class="text-center mb-5">ToDo FastAPI/Python & VueJS</h1>
-		<div class="container text-start w-50">
-			<router-view/>
+		<div class="container text-start">
+			<router-view />
 		</div>
 	</div>
 </template>

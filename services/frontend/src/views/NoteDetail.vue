@@ -1,5 +1,5 @@
 <template>
-	<div class="card" :class="createClassImportance">
+	<div class="card w-50 mx-auto" :class="createClassImportance">
 		<h5 class="card-header" :class="createClassImportance">Note</h5>
 		<div class="card-body">
 			<h5 class="card-title">{{ note.titleNote }}</h5>

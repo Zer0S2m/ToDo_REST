@@ -1,5 +1,5 @@
 <template>
-	<ol class="list-group list-group-numbered">
+	<ol class="list-group list-group-numbered w-50 mx-auto">
 		<CategoryItem
 			v-for="category in getCategories" :key="category"
 			:category="category"

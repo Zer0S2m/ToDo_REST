@@ -1,5 +1,5 @@
 <template>
-		<div v-if="getIsShowFormCategory" class="modal fade show" id="exampleModal" style="display: block;">
+	<div v-if="getIsShowFormCategory" class="modal fade show" id="exampleModal" style="display: block;">
 		<div class="modal-dialog modal-dialog modal-dialog-centered">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -7,7 +7,7 @@
 					<button type="button" @click="closeForm" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
-					<form 
+					<form
 						id="create-category-form"
 						@submit.prevent=submit
 					>

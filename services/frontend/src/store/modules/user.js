@@ -35,7 +35,7 @@ export default {
 					state.dispatch("getCategories");
 
 					router.push({
-						name: "Index"
+						name: "ListNotes"
 					});
 				})
 				.catch((error) => {
