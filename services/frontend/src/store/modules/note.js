@@ -13,7 +13,7 @@ export default {
 		setShowModalForm: function(state, val) {
 			state.isShowModalForm = val;
 		},
-		setActionForFormNote(state, val) {
+		setActionForFormNote: function(state, val) {
 			state.actionForm = val;
 		},
 		addNote: function(state, note) {
@@ -60,7 +60,7 @@ export default {
 				state.commit("updateNotes", id);
 
 				router.push({
-					name: "Index"
+					name: "ListNotes"
 				});
 			})
 			.catch(error => {

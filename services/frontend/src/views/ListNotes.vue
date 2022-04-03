@@ -3,23 +3,9 @@
 		<div class="mb-3">
 			<div class="d-flex align-items-center">
 				<div class="me-3">
-					<select v-model="importance" @change="selectImportance" class="form-select" aria-label="Default select example">
-						<option value="" selected>Sort by importance notes</option>
-						<option value="ascending">ascending</option>
-						<option value="descending">descending</option>
-					</select>
+					<Select />
 				</div>
-				<div class="d-flex align-items-center">
-					<h6 class="my-0 me-2">Categories:</h6>
-					<select v-model="categories" @change="selectCategries" class="form-select" size="1" multiple>
-						<option
-							v-for="category in getCategories" :key="category.id"
-							:value="category.slug"
-						>
-							{{ category.title }}
-						</option>
-					</select>
-				</div>
+				<Categories />
 			</div>
 		</div>
 		<div class="row">
@@ -33,47 +19,32 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import {
+	mapGetters,
+} from "vuex";
 
 import NoteItem from "@/components/NoteItem";
+import Select from "@/components/filters/Select";
+import Categories from "@/components/filters/Categories";
 
 
 export default {
 	name: 'ListNotes',
-	data() {
-		return {
-			notes: [],
-			importance: "",
-			categories: []
-		}
-	},
 	components: {
-		NoteItem
-	},
-	methods: {
-		selectImportance: function() {
-			if ( this.importance === "ascending" ) this.notes.sort((a, b) => a.importance > b.importance ? 1 : -1)
-			else if ( this.importance === "descending" ) this.notes.sort((a, b) => a.importance < b.importance ? 1 : -1);
-		},
-		selectCategries: function() {
-			if ( this.categories.length !== 0 ) {
-				const notesFilter = this.getNotes.filter(note => this.categories.includes(note.categorySlug));
-				this.notes = notesFilter;
-				this.selectImportance();
-			} else {
-				this.notes = [...this.getNotes];
-				this.selectImportance();
-			};
-		},
+		NoteItem,
+		Select,
+		Categories
 	},
 	computed: {
 		...mapGetters([
 			"getNotes",
-			"getCategories",
+			"getFilteredNotesByImportance",
+			"getFilteredNotesByCategories"
 		]),
 		returnNotes: function() {
-			if ( this.notes.length === 0 && this.categories.length === 0 ) this.notes = [...this.getNotes];
-			return this.notes;
+			let notes = this.getFilteredNotesByImportance([...this.getNotes]);
+			notes = this.getFilteredNotesByCategories(notes);
+			return notes;
 		}
 	},
 }
