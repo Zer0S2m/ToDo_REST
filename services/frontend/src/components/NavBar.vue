@@ -7,7 +7,7 @@
 						:to="{ name: 'ListNotes' }"
 						class="navbar-link me-3"
 					>
-						<img src="@/assets/logo.png" alt="" width="30" height="24" class="d-inline-block align-text-top">
+						<img src="@/assets/img/logo.png" alt="" width="30" height="24" class="d-inline-block align-text-top">
 						<span>ToDo</span>
 					</router-link>
 					<router-link
@@ -103,15 +103,15 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .navbar-link {
-	color: #000;
+	color: #000000;
 	text-decoration: none;
 	display: flex;
 	align-items: center;
-}
 
-.navbar-link span {
-	margin-left: 6px;
+	span {
+		margin-left: 6px;
+	}
 }
 </style>

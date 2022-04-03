@@ -18,12 +18,12 @@ import {
 
 
 export default {
-	name: "Select",
+	name: "SelectImportance",
 	data() {
 		return {
 			filters: [
-				{ value: "ascending", title: "Ascending" },
-				{ value: "descending", title: "Descending" },
+				{ value: 1, title: "Ascending" },
+				{ value: -1, title: "Descending" },
 			]
 		}
 	},

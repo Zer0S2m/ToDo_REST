@@ -1,5 +1,5 @@
 <template>
-	<div class="w-50 mx-auto">
+	<div class="container-content container-content--small">
 		<h2 class="text-center">Login</h2>
 		<form
 			@submit.prevent=submit
@@ -66,7 +66,3 @@ export default {
 	}
 }
 </script>
-
-<style scoped>
-
-</style>

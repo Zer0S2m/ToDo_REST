@@ -180,9 +180,9 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 #exampleModal {
-	background-color: rgba(0, 0, 0, 0.5);
+	background-color: rgba(#000000, 0.5);
 }
 
 .importance-radio {
@@ -196,21 +196,24 @@ export default {
   border-radius: 4px;
 	color: #ffffff;
   text-transform: uppercase;
-  transition: all 0.2s ease;
-}
-.importance-radio::before {
-	content: attr(label);
-}
-.importance-radio:checked {
-	max-width: 100px;
-}
-.importance-radio.importance-radio-1 {
-	background-color: rgba(110, 219, 128, 1);
-}
-.importance-radio.importance-radio-2 {
-	background-color: rgba(247, 189, 64, 1);
-}
-.importance-radio.importance-radio-3 {
-	background-color: rgba(224, 35, 41, 1);
+  transition: $animate;
+
+	&::before {
+		content: attr(label);
+	}
+
+	&:checked {
+		max-width: 100px;
+	}
+
+	&.importance-radio-1 {
+		background-color: $color-importance-1;
+	}
+	&.importance-radio-2 {
+		background-color: $color-importance-2;
+	}
+	&.importance-radio-3 {
+		background-color: $color-importance-3;
+	}
 }
 </style>

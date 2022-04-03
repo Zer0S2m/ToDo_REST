@@ -1,5 +1,5 @@
 <template>
-	<div class="card w-50 mx-auto" :class="createClassImportance">
+	<div class="card container-content container-content--small" :class="createClassImportance">
 		<h5 class="card-header" :class="createClassImportance">Note</h5>
 		<div class="card-body">
 			<h5 class="card-title">{{ note.titleNote }}</h5>
@@ -109,58 +109,62 @@ export default {
 }
 </script>
 
-<style scoped>
-.card-btn {
-	outline: none;
-	border: none;
-	background-color: transparent;
-	padding: 0;
-	color: #0d6efd;
-  text-decoration: underline;
+<style lang="scss" scoped>
+.card {
+	&.importance-1 {
+		border: 1px solid rgba($color-importance-1, 0.75);
+	}
+	&.importance-2 {
+		border: 1px solid rgba($color-importance-2, 0.75);
+	}
+	&.importance-3 {
+		border: 1px solid rgba($color-importance-3, 0.75);
+	}
+
+	.card-btn {
+		outline: none;
+		border: none;
+		background-color: transparent;
+		padding: 0;
+		color: #0d6efd;
+		text-decoration: underline;
+	}
 }
 
-.card.importance-1 {
-	border: 1px solid rgba(110, 219, 128, 0.75);
+.card-header {
+	&.importance-1 {
+		border-bottom: 1px solid rgba($color-importance-1, 0.75);
+	}
+	&.importance-2 {
+		border-bottom: 1px solid rgba($color-importance-2, 0.75);
+	}
+	&.importance-3 {
+		border-bottom: 1px solid rgba($color-importance-3, 0.75);
+	}
 }
 
-.card.importance-2 {
-	border: 1px solid rgba(247, 189, 64, 0.75);
+.card-footer {
+	&.importance-1 {
+		border-top: 1px solid rgba($color-importance-1, 0.75);
+	}	
+	&.importance-2 {
+		border-top: 1px solid rgba($color-importance-2, 0.75);
+	}
+	&.importance-3 {
+		border-top: 1px solid rgba($color-importance-3, 0.75);
+	}
 }
 
-.card.importance-3 {
-	border: 1px solid rgba(224, 35, 41, 0.75);
-}
-
-.card-header.importance-1,
-.card-footer.importance-1 {
-	background-color: rgba(110, 219, 128, 0.15);
-}
-.card-header.importance-1 {
-	border-bottom: 1px solid rgba(110, 219, 128, 0.75);
-}
-.card-footer.importance-1 {
-	border-top: 1px solid rgba(110, 219, 128, 0.75);
-}
-
-.card-header.importance-2,
-.card-footer.importance-2 {
-	background-color: rgba(247, 189, 64, 0.15);
-}
-.card-header.importance-2 {
-	border-bottom: 1px solid rgba(247, 189, 64, 0.75);
-}
-.card-footer.importance-2 {
-	border-top: 1px solid rgba(247, 189, 64, 0.75);
-}
-
-.card-header.importance-3,
-.card-footer.importance-3 {
-	background-color: rgba(224, 35, 41, 0.15);
-}
-.card-header.importance-3 {
-	border-bottom: 1px solid rgba(224, 35, 41, 0.75);
-}
-.card-footer.importance-3 {
-	border-top: 1px solid rgba(224, 35, 41, 0.75);
+.card-header,
+.card-footer {
+	&.importance-1 {
+		background-color: rgba($color-importance-1, 0.15);
+	}
+	&.importance-2 {
+		background-color: rgba($color-importance-2, 0.15);
+	}
+	&.importance-3 {
+		background-color: rgba($color-importance-3, 0.15);
+	}
 }
 </style>

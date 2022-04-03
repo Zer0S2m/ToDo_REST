@@ -1,0 +1,15 @@
+@import "./variables";
+@import "./mixins";
+
+.container {
+
+	&-content {
+		max-width: 972px;
+		width: 100%;
+		margin: 0 auto;
+
+		&.container-content--small {
+			max-width: 650px;
+		}
+	}
+}

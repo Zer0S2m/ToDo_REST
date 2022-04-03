@@ -1,0 +1,8 @@
+@mixin card-note-importance($color-importance) {
+	border: 1px solid rgba($color-importance, 0.75);
+	background-color: rgba($color-importance, 0.15);
+
+	&:hover {
+		background-color: rgba($color-importance, 0.2);
+	}
+}

@@ -97,8 +97,8 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 #exampleModal {
-	background-color: rgba(0, 0, 0, 0.5);
+	background-color: rgba(#000000, 0.5);
 }
 </style>
