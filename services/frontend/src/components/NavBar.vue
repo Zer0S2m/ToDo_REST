@@ -1,65 +1,14 @@
 <template>
-	<header class="mb-4">
-		<nav class="navbar navbar-light bg-light">
-			<div class="container-fluid container">
-				<div class="d-flex">
-					<router-link
-						:to="{ name: 'ListNotes' }"
-						class="navbar-link me-3"
-					>
-						<img src="@/assets/img/logo.png" alt="" width="30" height="24" class="d-inline-block align-text-top">
-						<span>ToDo</span>
-					</router-link>
-					<router-link
-						v-if="getInLogin"
-						:to="{ name: 'ListCategories' }"
-						class="link"
-					>
-						<span>Categoires</span>
-					</router-link>
-				</div>
-				<div>
-					<router-link
-						:to="{ name: 'UserAuth' }"
-						class="btn btn-primary me-2"
-						v-if="!getInLogin"
-					>
-						<span>Auth</span>
-					</router-link>
-					<router-link
-						:to="{ name: 'UserSignUp' }"
-						class="btn btn-primary"
-						v-if="!getInLogin"
-					>
-						<span>Sign up</span>
-					</router-link>
-					<button
-						v-if="getInLogin"
-						@click="openFormCategory"
-						type="button"
-						class="btn btn-primary me-2"
-					>
-  					Add Category
-					</button>
-					<button
-						v-if="getInLogin"
-						@click="openFormNote"
-						type="button"
-						class="btn btn-primary me-2"
-					>
-  					Add note
-					</button>
-					<button
-						v-if="getInLogin"
-						@click="logoutUser"
-						type="button"
-						class="btn btn-primary"
-					>
-						Logout
-					</button>
-				</div>
-			</div>
-		</nav>
+	<header class="header w100 df al-it-center">
+		<div class="header__wrapper">
+			<nav class="header__nav">
+				<ul class="header__nav-items df">
+					<li class="header__nav-item">
+						<SearchInput v-if="getInLogin" />
+					</li>
+				</ul>
+			</nav>
+		</div>
 	</header>
 </template>
 
@@ -70,13 +19,13 @@ import {
 	mapActions
 } from "vuex";
 
-import ModalForm from "./ModalForm";
+import SearchInput from "./filters/SearchInput";
 
 
 export default {
 	name: "NavBar",
 	components: {
-		ModalForm
+		SearchInput
 	},
 	methods: {
 		...mapMutations([
@@ -102,16 +51,3 @@ export default {
 	},
 }
 </script>
-
-<style lang="scss" scoped>
-.navbar-link {
-	color: #000000;
-	text-decoration: none;
-	display: flex;
-	align-items: center;
-
-	span {
-		margin-left: 6px;
-	}
-}
-</style>

@@ -1,48 +1,67 @@
 <template>
-	<div class="container-content container-content--small">
-		<h2 class="text-center">Registration</h2>
-		<form
-			@submit.prevent=submit
-		>
-			<div class="mb-3">
-				<label for="username" class="form-label">Username</label>
-				<input
-					v-model="username"
-					type="text"
-					class="form-control"
-					id="username"
-					required
+	<div class="container user">
+		<div class="user__content">
+			<h2 class="user__title">Sign up</h2>
+			<div class="user__back-form">
+				<form 
+					@submit.prevent="submit"
+					class="user__form"
 				>
-				<div v-if="errorUsername" class="text-danger">
-					<p v-text="errorUsername"></p>
-				</div>
+					<div class="user__form-block">
+						<label for="username-user" class="user__form-label primary-label">Username</label>
+						<input
+							type="text"
+							class="user__form-input primary-input"
+							id="username-user"
+							v-model="username"
+							required
+						>
+						<div class="user__form-error primary-input-error" v-if="errorUsername">
+							<p>
+								{{ errorUsername }}
+							</p>
+						</div>
+					</div>
+					<div class="user__form-block">
+						<label for="email-user" class="user__form-label primary-label">Email</label>
+						<input
+							type="email"
+							class="user__form-input primary-input"
+							id="email-user"
+							v-model="email"
+						>
+						<div class="user__form-error primary-input-error" v-if="errorEmail">
+							<p>
+								{{ errorEmail }}
+							</p>
+						</div>
+						<div class="primary-text-form">
+							<p>
+								Email is not required
+							</p>
+						</div>
+					</div>
+					<div class="user__form-block">
+						<label for="password-user" class="user__form-label primary-label">Password</label>
+						<input
+							type="password"
+							class="user__form-input primary-input"
+							id="password-user"
+							v-model="password"
+							required
+						>
+					</div>
+					<div class="user__form-block">
+						<button
+							type="submit"
+							class="primary-btn-form"
+						>
+							Sign up
+						</button>
+					</div>
+				</form>
 			</div>
-			<div class="mb-3">
-				<label for="email" class="form-label">Email</label>
-				<input
-					v-model="email"
-					type="email"
-					class="form-control"
-					id="email"
-				>
-				<div v-if="errorEmail" class="text-danger">
-					<p v-text="errorEmail"></p>
-				</div>
-				<div class="form-text">Email is not required</div>
-			</div>
-			<div class="mb-3">
-				<label for="password" class="form-label">Password</label>
-				<input
-					v-model="password"
-					type="password"
-					class="form-control"
-					id="password"
-					autocomplete="off"
-					required	
-				>
-			</div>
-			<button type="submit" class="btn btn-primary">Sign up</button>
-		</form>
+		</div>
 	</div>
 </template>
 

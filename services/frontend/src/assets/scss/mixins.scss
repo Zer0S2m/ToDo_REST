@@ -1,8 +1,42 @@
 @mixin card-note-importance($color-importance) {
-	border: 1px solid rgba($color-importance, 0.75);
-	background-color: rgba($color-importance, 0.15);
+	&::before {
+		background-color: $color-importance;
+	}
+
+	&::after {
+		background: linear-gradient(135deg, rgba($color-importance, 0.075) 0%, rgba($color-black, 0) 100%);
+	}
+	&:hover {
+		&::after {
+			width: 100%;
+			height: 100%;
+		}
+	}
+}
+
+@mixin check-importance-level-before($color-importance) {
+	color: $color-importance;
+
+	&::before {
+		background-color: $color-importance;
+	}
+}
+
+@mixin check-importance-level($color-importance) {
+	&::before {
+		border: 2px solid $color-importance;
+	}
 
 	&:hover {
-		background-color: rgba($color-importance, 0.2);
+		color: $color-importance;
+	}
+}
+
+
+@mixin importance-radio-form-note($color-importance) {
+	background-color: $color-importance;
+
+	&:hover {
+		background-color: darken($color: $color-importance, $amount: 10);
 	}
 }

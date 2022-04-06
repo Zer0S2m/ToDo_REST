@@ -1,0 +1,15 @@
+.header {
+	position: fixed;
+	z-index: 100;
+	top: 0;
+	right: 0;
+	width: calc(100% - $width-sidebar);
+	height: 60px;
+
+	box-shadow: 0 -4px 8px $color-black;
+	background-color: $color-white;
+
+	&__wrapper {
+		padding: 0px 20px;
+	}
+}

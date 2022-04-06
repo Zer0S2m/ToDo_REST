@@ -1,40 +1,62 @@
 <template>
-	<div v-if="getIsShowFormCategory" class="modal fade show" id="exampleModal" style="display: block;">
-		<div class="modal-dialog modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel">Create category</h5>
-					<button type="button" @click="closeForm" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
+	<div v-show="getIsShowFormCategory && getInLogin" class="popup">
+		<div class="popup-wrapper">
+			<div class="popup-container">
+				<button
+					type="button"
+					class="popup-close df"
+					@click="closeForm"
+				>
+					<img src="@/assets/img/delete-note.svg" alt="" class="popup-close-img">
+				</button>
+				<div class="popup-area">
 					<form
-						id="create-category-form"
-						@submit.prevent=submit
+					@submit.prevent="submit"
+						class="popup-form"
 					>
-					<div v-if="error">
-						<p v-text="error" class="text-danger fs-5"></p>
-					</div>
-					<div class="mb-3">
-						<label for="title-category" class="form-label">Title</label>
-						<input
-							v-model="titleCategory"
-							type="text"
-							class="form-control" id="title-category"
-						>
-					</div>
-					<div class="mb-3">
-						<label for="slug-category" class="form-label">Slug</label>
-						<input
-							v-model="slugCategory"
-							type="text"
-							class="form-control" id="slug-category"
-						>
-					</div>
-				</form>
-				</div>
-				<div class="modal-footer">
-					<button @click="closeForm" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-					<button type="submit" form="create-category-form" class="btn btn-primary">Send</button>
+						<div class="primary-error-form" v-if="error">
+							<p>
+								{{ error }}
+							</p>
+						</div>
+						<div class="popup-form-block df column">
+							<label for="title-category" class="primary-label popup-form-label">Title</label>
+							<input
+								required
+								id="title-category"
+								v-model="titleCategory"
+								type="text"
+								class="primary-input popup-form-input"
+								placeholder="Title"
+							>
+						</div>
+						<div class="popup-form-block df column">
+							<label for="slug-category" class="primary-label popup-form-label">Slug</label>
+							<input
+								required
+								id="slug-category"
+								v-model="slugCategory"
+								type="text"
+								class="primary-input popup-form-input"
+								placeholder="Slug"
+							>
+						</div>
+						<div class="popup-form-block df al-it-center">
+							<button
+								type="submit"
+								class="primary-btn-form"
+							>
+								Send
+							</button>
+							<button
+								class="primary-btn-form-cancel"
+								type="button"
+								@click="closeForm"
+							>
+								Cancel
+							</button>
+						</div>
+					</form>
 				</div>
 			</div>
 		</div>
@@ -91,14 +113,9 @@ export default {
 	},
 	computed: {
 		...mapGetters([
-			"getIsShowFormCategory"
+			"getIsShowFormCategory",
+			"getInLogin"
 		])
 	}
 }
 </script>
-
-<style lang="scss" scoped>
-#exampleModal {
-	background-color: rgba(#000000, 0.5);
-}
-</style>

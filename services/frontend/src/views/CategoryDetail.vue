@@ -1,20 +1,12 @@
 <template>
-	<div class="container-content mx-auto">
-		<div class="mb-3">
-			<div class="d-flex align-items-center">
-				<div class="me-3">
-					<SelectImportance />
-				</div>
-				<ImportanceLevels class="me-3" />
-			</div>
-		</div>
-		<div class="row">
+	<div class="container">
+		<ul class="notes-items">
 			<NoteItem
 				v-for="note in getNotes" :key="note.id"
 				:note="note"
 			>
 			</NoteItem>
-		</div>
+		</ul>
 	</div>
 </template>
 
@@ -22,16 +14,12 @@
 import { mapGetters } from "vuex";
 
 import NoteItem from "@/components/NoteItem";
-import SelectImportance from "@/components/filters/SelectImportance";
-import ImportanceLevels from "@/components/filters/ImportanceLevels";
 
 
 export default {
 	name: "CategoryDetail",
 	components: {
 		NoteItem,
-		SelectImportance,
-		ImportanceLevels
 	},
 	computed: {
 		...mapGetters([

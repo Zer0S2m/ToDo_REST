@@ -1,13 +1,15 @@
 <template>
-	<select v-model="importance" class="form-select">
-		<option value="" selected>Sort by importance notes</option>
-		<option
-			v-for="(filter, index) in filters" :key="index"
-			:value="filter.value"
-		>
-			{{ filter.title }}
-		</option>
-	</select>
+	<div class="select-importance">
+		<h4 class="select-importance__title">Sort by importance notes</h4>
+		<div class="select-importance__wrapper">
+			<div class="select-importance__back-radio">
+				<div class="select-importance__radio" v-for="(filter, index) in filters" :key="index">
+					<input type="radio" :value="filter.value" :id="filter.idFor" v-model="importance">
+					<label :for="filter.idFor">{{ filter.title }}</label>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script>
@@ -22,8 +24,9 @@ export default {
 	data() {
 		return {
 			filters: [
-				{ value: 1, title: "Ascending" },
-				{ value: -1, title: "Descending" },
+				{ value: 0, title: "Default", idFor: "importance-sort-0" },
+				{ value: 1, title: "Ascending", idFor: "importance-sort-up" },
+				{ value: -1, title: "Descending", idFor: "importance-sort-down" },
 			]
 		}
 	},

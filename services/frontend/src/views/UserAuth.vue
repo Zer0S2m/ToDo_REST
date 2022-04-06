@@ -1,35 +1,48 @@
 <template>
-	<div class="container-content container-content--small">
-		<h2 class="text-center">Login</h2>
-		<form
-			@submit.prevent=submit
-		>
-			<div v-if="error">
-				<p v-text="error" class="text-danger fs-5"></p>
-			</div>
-			<div class="mb-3">
-				<label for="username" class="form-label">Username</label>
-				<input
-					v-model="username"
-					type="text"
-					class="form-control"
-					id="username"
-					required
+	<div class="container user">
+		<div class="user__content">
+			<h2 class="user__title">Login</h2>
+			<div class="user__back-form">
+				<form
+					@submit.prevent="submit"
+					class="user__form"
 				>
+					<div class="primary-error-form" v-if="error">
+						<p>
+							{{ error }}
+						</p>
+					</div>
+					<div class="user__form-block">
+						<label for="username-user" class="user__form-label primary-label">Username</label>
+						<input
+							type="text"
+							class="user__form-input primary-input"
+							id="username-user"
+							v-model="username"
+							required
+						>
+					</div>
+					<div class="user__form-block">
+						<label for="password-user" class="user__form-label primary-label">Password</label>
+						<input
+							type="password"
+							class="user__form-input primary-input"
+							id="password-user"
+							v-model="password"
+							required
+						>
+					</div>
+					<div class="user__form-block">
+						<button
+							type="submit"
+							class="primary-btn-form"
+						>
+							Login
+						</button>
+					</div>
+				</form>
 			</div>
-			<div class="mb-3">
-				<label for="password" class="form-label">Password</label>
-				<input
-					v-model="password"
-					type="password"
-					class="form-control"
-					id="password"
-					autocomplete="off"
-					required	
-				>
-			</div>
-			<button type="submit" class="btn btn-primary">login</button>
-		</form>
+		</div>
 	</div>
 </template>
 

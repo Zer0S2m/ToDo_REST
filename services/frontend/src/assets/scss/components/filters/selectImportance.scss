@@ -1,0 +1,59 @@
+.select-importance {
+
+	&__title {
+		color: #ffffff;
+    font-weight: normal;
+	}
+
+	&__wrapper {
+		margin-top: 16px;
+	}
+
+	&__radio {
+		margin-bottom: 10px;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+
+		label {
+			cursor: pointer;
+			color: $color-white;
+			display: inline-block;
+			position: relative;
+			user-select: none;
+
+			&::before {
+				content: "";
+				display: inline-block;
+				width: 14px;
+				height: 14px;
+				position: relative;
+				top: 2px;
+				border: 1px solid $primary-color-4;
+				border-radius: 50%;
+				margin-right: 6px;
+				background-repeat: no-repeat;
+				background-position: center center;
+				background-size: 65% 65%;
+
+				transition: $animate;
+			}
+		}
+
+		input {
+			position: absolute;
+			z-index: -1;
+			opacity: 0;
+
+			&:checked {
+				~label {
+					&::before {
+						background-color: $primary-color-4;
+						background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+					}
+				}
+			}
+		}
+	}
+}

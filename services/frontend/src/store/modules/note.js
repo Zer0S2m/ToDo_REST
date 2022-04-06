@@ -5,13 +5,13 @@ import router from "@/router";
 
 export default {
 	state: {
-		isShowModalForm: false,
+		isShowNoteForm: false,
 		actionForm: false,
 		notes: [],
 	},
 	mutations: {
-		setShowModalForm: function(state, val) {
-			state.isShowModalForm = val;
+		setShowNoteForm: function(state, val) {
+			state.isShowNoteForm = val;
 		},
 		setActionForFormNote: function(state, val) {
 			state.actionForm = val;
@@ -49,23 +49,25 @@ export default {
 	actions: {
 		deleteNote: function(state, id) {
 			const idNote = state.getters.getNote(id).idNote;
+			state.commit("updateNotes", id);
+			state.commit("deleteNote", id);
 
-			axios.delete(`note/delete`,{
-				data: {
-					"idNote": idNote
-				}
-			})
-			.then((res) => {
-				state.commit("deleteNote", id);
-				state.commit("updateNotes", id);
+			// axios.delete(`note/delete`, {
+			// 	data: {
+			// 		"idNote": idNote
+			// 	}
+			// })
+			// .then((res) => {
+			// 	state.commit("deleteNote", id);
+			// 	state.commit("updateNotes", id);
 
-				router.push({
-					name: "ListNotes"
-				});
-			})
-			.catch(error => {
-				console.error(error)
-			});
+				// router.push({
+				// 	name: "ListNotes"
+				// });
+			// })
+			// .catch(error => {
+			// 	console.error(error)
+			// });
 		},
 		getNotes: function(state) {
 			axios.get("/note")
@@ -151,8 +153,8 @@ export default {
 		getNote: (state) => (idNote) => {
 			return state.notes[idNote];
 		},
-		getShowModal(state) {
-			return state.isShowModalForm;
+		getShowNoteForm(state) {
+			return state.isShowNoteForm;
 		},
 		getActionForm(state) {
 			return state.actionForm;

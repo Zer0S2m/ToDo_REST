@@ -1,0 +1,91 @@
+.notes-items {
+	display: flex;
+	flex-wrap: wrap;
+	column-gap: 16px;
+}
+
+.note {
+	max-width: 32%;
+	width: 100%;
+	margin-bottom: 20px;
+	background-color: $color-white;
+	box-shadow: 0px 2px 8px -6px $color-black;
+
+	position: relative;
+	z-index: 1;
+
+	&::before {
+		position: absolute;
+		content: "";
+		width: 3px;
+		height: 100%;
+		left: 0;
+		top: 0;
+	}
+
+	&::after {
+		position: absolute;
+		content: "";
+		height: 0;
+		width: 0;
+		top: 0;
+		left: 0;
+		z-index: -1;
+		transition: $animate
+	}
+
+	&.importance-0 {
+		@include card-note-importance($color-importance-0);
+	}
+
+	&.importance-1 {
+		@include card-note-importance($color-importance-1);
+	}
+
+	&.importance-2 {
+		@include card-note-importance($color-importance-2);
+	}
+
+	&.importance-3 {
+		@include card-note-importance($color-importance-3);
+	}
+
+	&-content {
+		padding: 12px 10px 12px 20px;
+	}
+
+	&-date {
+		font-size: 12px;
+		font-weight: 500;
+    opacity: 0.5;
+	}
+
+	&-delete {
+		opacity: 0.75;
+		transition: $animate;
+
+		&:hover {
+			opacity: 0.85;
+		}
+
+		&-img {
+			width: 14px;
+			height: 14px;
+		}
+	}
+
+	&-title {
+		font-weight: normal;
+		font-size: 20px;
+		margin-top: 12px;
+	}
+
+	&-text {
+		margin-top: 8px;
+		font-size: 16px;
+	}
+
+	&-back-link {
+		margin-top: 20px;
+	}
+}

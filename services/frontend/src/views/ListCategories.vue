@@ -1,11 +1,13 @@
 <template>
-	<ol class="list-group list-group-numbered container-content container-content--small">
-		<CategoryItem
-			v-for="category in getCategories" :key="category"
-			:category="category"
-		>
-		</CategoryItem>
-	</ol>
+	<div class="container">
+		<ul class="category-items">
+			<CategoryItem
+				v-for="category in getCategories" :key="category"
+				:category="category"
+			>
+			</CategoryItem>
+		</ul>
+	</div>
 </template>
 
 <script>

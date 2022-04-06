@@ -1,6 +1,6 @@
 export default {
 	state: {
-		importanceFilter: "",
+		importanceFilter: 0,
 		categoriesFilter: [],
 		importanceLevelsFilter: []
 	},

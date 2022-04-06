@@ -1,34 +1,31 @@
 <template>
-	<div id="app">
-		<NavBar />
-		<ModalForm />
-		<CategoryForm />
-		<h1 class="text-center mb-5">ToDo FastAPI/Python & VueJS</h1>
-		<div class="container text-start">
-			<router-view />
+	<div>
+		<div class="df">
+			<Sidebar />
+			<main class="main w100">
+				<NavBar />
+				<router-view />
+			</main>
+			<NoteForm />
+			<CategoryForm />
 		</div>
 	</div>
 </template>
 
 <script>
 import NavBar from "./components/NavBar";
-import ModalForm from "./components/ModalForm";
+import NoteForm from "./components/NoteForm";
 import CategoryForm from "./components/CategoryForm";
+import Sidebar from "./components/Sidebar";
 
 
 export default {
 	name: 'App',
 	components: {
 		NavBar,
-		ModalForm,
-		CategoryForm
-	},
+		NoteForm,
+		CategoryForm,
+		Sidebar
+	}
 }
 </script>
-
-<style lang="scss">
-#app {
-	font-family: 'Avenir', Helvetica, Arial, sans-serif;
-	padding-bottom: 60px;
-}
-</style>

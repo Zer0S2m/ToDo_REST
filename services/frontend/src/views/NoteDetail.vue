@@ -1,40 +1,49 @@
 <template>
-	<div class="card container-content container-content--small" :class="createClassImportance">
-		<h5 class="card-header" :class="createClassImportance">Note</h5>
-		<div class="card-body">
-			<h5 class="card-title">{{ note.titleNote }}</h5>
-			<p class="card-text mb-2">
-				{{ note.textNote }}
-			</p>
-			<div
-				v-if="note.categorySlug"
-				class="mb-3 d-flex"
-			>
-				<p class="mb-0">
-					<span class="fw-bold">Category</span> -
-					<router-link 
-						:to="{ name: 'CategoryDetail', params: { slug: note.categorySlug } }"
-						class="link"
-					>
-						<span>{{ getCategoryTitle(note.categorySlug) }}</span>
-					</router-link>
+	<div class="container note-detail-importance" :class="createClassImportance">
+		<div class="note-detail">
+			<h3 class="note-detail__title">{{ note.titleNote }}</h3>
+			<div class="note-detail__text">
+				<p>
+					{{ note.textNote }}
 				</p>
 			</div>
-			<button
-				v-if="note.fileName"
-				type="button"
-				@click.prevent="
-					downloadItem()
-				"
-				class="card-link d-flex mb-3 card-btn"
-			>
-			{{ note.fileName }}
-			</button>
-			<button @click="editNote" type="button" class="btn btn-primary me-2">Edit</button>
-			<button @click="toDeleteNote" type="button" class="btn btn-danger">Delete</button>
-		</div>
-		<div class="card-footer text-muted" :class="createClassImportance">
-			{{ note.pubDate }}
+			<div class="note-detail__category" v-if="note.categorySlug">
+				<h3 class="note-detail__category-title">
+					<span>Category: </span>
+					<router-link
+						:to="{ name: 'CategoryDetail', params: { slug: note.categorySlug } }"
+						class="note-detail__category-link"
+					>
+						{{ getCategoryTitle(note.categorySlug) }}
+					</router-link>
+				</h3>
+			</div>
+			<div class="df note-detail__back-file" v-if="note.fileName">
+				<button
+					type="button"
+				 	class="note-detail__file df al-it-center"
+				 	@click="downloadItem"
+				>
+			 		<span>{{ note.fileName }}</span>
+					<img src="@/assets/img/file-black.svg" alt="">
+				</button>
+			</div>
+			<div class="df al-it-center note-detail__btns">
+				<button
+					type="button"
+					class="note-detail__btn primary-btn"
+					@click="editNote"
+				>
+					Edit
+				</button>
+				<button
+					type="button"
+					class="note-detail__btn primary-btn red-btn"
+					@click="toDeleteNote"
+				>
+					Delete
+				</button>
+			</div>
 		</div>
 	</div>
 </template>
@@ -62,13 +71,13 @@ export default {
 		]),
 		...mapMutations([
 			"setActionForFormNote",
-			"setShowModalForm"
+			"setShowNoteForm"
 		]),
 		toDeleteNote() {
 			this.deleteNote(this.note.id);
 		},
 		editNote() {
-			this.setShowModalForm(true);
+			this.setShowNoteForm(true);
 			this.setActionForFormNote("edit");
 		},
     forceFileDownload(response){
@@ -100,7 +109,7 @@ export default {
 			"getCategoryTitle"
 		]),
 		createClassImportance: function() {
-			return `importance-${this.note.importance}`;
+			return `note-detail-importance-${this.note.importance}`;
 		},
 	},
 	created() {
@@ -108,63 +117,3 @@ export default {
 	}
 }
 </script>
-
-<style lang="scss" scoped>
-.card {
-	&.importance-1 {
-		border: 1px solid rgba($color-importance-1, 0.75);
-	}
-	&.importance-2 {
-		border: 1px solid rgba($color-importance-2, 0.75);
-	}
-	&.importance-3 {
-		border: 1px solid rgba($color-importance-3, 0.75);
-	}
-
-	.card-btn {
-		outline: none;
-		border: none;
-		background-color: transparent;
-		padding: 0;
-		color: #0d6efd;
-		text-decoration: underline;
-	}
-}
-
-.card-header {
-	&.importance-1 {
-		border-bottom: 1px solid rgba($color-importance-1, 0.75);
-	}
-	&.importance-2 {
-		border-bottom: 1px solid rgba($color-importance-2, 0.75);
-	}
-	&.importance-3 {
-		border-bottom: 1px solid rgba($color-importance-3, 0.75);
-	}
-}
-
-.card-footer {
-	&.importance-1 {
-		border-top: 1px solid rgba($color-importance-1, 0.75);
-	}	
-	&.importance-2 {
-		border-top: 1px solid rgba($color-importance-2, 0.75);
-	}
-	&.importance-3 {
-		border-top: 1px solid rgba($color-importance-3, 0.75);
-	}
-}
-
-.card-header,
-.card-footer {
-	&.importance-1 {
-		background-color: rgba($color-importance-1, 0.15);
-	}
-	&.importance-2 {
-		background-color: rgba($color-importance-2, 0.15);
-	}
-	&.importance-3 {
-		background-color: rgba($color-importance-3, 0.15);
-	}
-}
-</style>

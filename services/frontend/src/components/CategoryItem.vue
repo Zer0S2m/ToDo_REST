@@ -1,24 +1,21 @@
 <template>
-	<li class="list-group-item d-flex justify-content-between align-items-start">
-		<div class="ms-2 me-auto">
-			<div class="fw-bold">
-				<router-link
-					:to="{ name: 'CategoryDetail', params: { slug: category.slug } }"
-					class="link"
-				>
-					<span>{{ category.title }}</span>
-				</router-link>
-			</div>
-		</div>
-		<div class="d-flex align-items-center">
-			<span class="badge bg-primary rounded-pill h-100 me-3">{{ setCountNotesInCategory }}</span>
-			<button
-				type="button"
-				class="btn btn-danger py-0"
-				@click="delCategory"
+	<li class="category-item">
+		<div class="category-item-wrapper  df al-it-center just-between">
+			<router-link
+				:to="{ name: 'CategoryDetail', params: { slug: category.slug } }"
+				class="category-item-link"
 			>
-				Del
-			</button>
+				{{ category.title }}<span>({{ setCountNotesInCategory }})</span>
+			</router-link>
+			<div class="df al-it-center">
+				<button
+					type="button"
+					class="category-item__delete df"
+					@click="delCategory"
+				>
+					<img src="@/assets/img/delete-category.svg" alt="" class="category-item__delete-img">
+				</button>
+			</div>
 		</div>
 	</li>
 </template>
@@ -50,7 +47,6 @@ export default {
 		setCountNotesInCategory: function() {
 			let notes = this.getNotes;
 			notes = notes.filter(note => note.categorySlug === this.category.slug);
-
 			return notes.length;
 		}
 	},

@@ -1,15 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap');
+
+@import "./reset";
 @import "./variables";
 @import "./mixins";
+@import "./common";
 
-.container {
+@import "./views/form";
+@import "./views/noteDetail";
 
-	&-content {
-		max-width: 972px;
-		width: 100%;
-		margin: 0 auto;
+@import "./components/sidebar";
+@import "./components/navbar";
+@import "./components/noteItem";
+@import "./components/categoryItem";
+@import "./components/noteForm";
 
-		&.container-content--small {
-			max-width: 650px;
-		}
-	}
-}
+@import "./components/filters/importanceLevels";
+@import "./components/filters/selectImportance";
+@import "./components/filters/searchInput";

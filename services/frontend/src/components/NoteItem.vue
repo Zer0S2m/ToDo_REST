@@ -1,47 +1,59 @@
 <template>
-	<div class="col-4 mb-4">
-		<router-link
-			:to="{ name: 'NoteDetail', params: { id: note.id } }"
-			class="list-group-item list-group-item-action"
-			:class="classImportance"
-		>
-			<div>
-				<h5 class="mb-1">{{ note.titleNote }}</h5>
-				<p class="mb-0">{{ note.textNote }}</p>
-			</div>
-			<p class="mb-0 mt-2">
-				<small>
+	<li
+		class="note"
+		:class="getClassImportance"
+	>
+	<div class="note-wrapper df h100">
+		<div class="note-content df column just-between w100">
+			<div class="note-area">
+				<div class="note-date df al-it-center just-between w100">
 					<time>{{ note.pubDate }}</time>
-				</small>
-			</p>
-		</router-link>
+					<button
+						type="button"
+						class="note-delete df"
+						@click="deleteNote(note.id)"
+					>
+						<img src="@/assets/img/delete-note.svg" alt="" class="note-delete-img">
+					</button>
+				</div>
+				<h4 class="note-title">{{ note.titleNote }}</h4>
+				<div class="note-text">
+					<p>
+						{{ note.textNote }}
+					</p>
+				</div>
+			</div>
+			<div class="note-back-link df">
+				<router-link
+					:to="{ name: 'NoteDetail', params: { id: note.id } }"
+					class="note-link df primary-btn"
+				>
+					More
+				</router-link>
+			</div>
+		</div>
 	</div>
+	</li>
 </template>
 
 <script>
+import { mapActions } from "vuex";
+
+
 export default {
 	name: "NoteItem",
 	props: {
 		note: Object,
 	},
-	data() {
-		return {
-			classImportance: `importance-${this.note.importance}`
-		}
+	methods: {
+		...mapActions([
+			"deleteNote"
+		]),
 	},
-}
-</script>
-
-<style lang="scss" scoped>
-.list-group-item-action {
-	transition: $animate;
-
-	&:hover {
-		color: initial;
+	computed: {
+		getClassImportance: function() {
+			return `importance-${this.note.importance}`;
+		}
 	}
 }
-
-.importance-1 { @include card-note-importance($color-importance-1); }
-.importance-2 { @include card-note-importance($color-importance-2); }
-.importance-3 { @include card-note-importance($color-importance-3); }
-</style>
+</script>
