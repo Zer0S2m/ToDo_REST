@@ -57,7 +57,8 @@ def create_slug_category(
 	slug: str,
 	user_id: int
 ) -> str:
-	return f"{slug}_{user_id}"
+	slug_split = slug.strip().split(" ")
+	return f"{'_'.join(slug_split)}_{user_id}"
 
 
 def create_note_schema(

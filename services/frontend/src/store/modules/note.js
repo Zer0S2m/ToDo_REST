@@ -1,7 +1,5 @@
 import axios from "axios"
 
-import router from "@/router";
-
 
 export default {
 	state: {
@@ -49,25 +47,19 @@ export default {
 	actions: {
 		deleteNote: function(state, id) {
 			const idNote = state.getters.getNote(id).idNote;
-			state.commit("updateNotes", id);
-			state.commit("deleteNote", id);
 
-			// axios.delete(`note/delete`, {
-			// 	data: {
-			// 		"idNote": idNote
-			// 	}
-			// })
-			// .then((res) => {
-			// 	state.commit("deleteNote", id);
-			// 	state.commit("updateNotes", id);
-
-				// router.push({
-				// 	name: "ListNotes"
-				// });
-			// })
-			// .catch(error => {
-			// 	console.error(error)
-			// });
+			axios.delete(`note/delete`, {
+				data: {
+					"idNote": idNote
+				}
+			})
+			.then((res) => {
+				state.commit("deleteNote", id);
+				state.commit("updateNotes", id);
+			})
+			.catch(error => {
+				console.error(error)
+			});
 		},
 		getNotes: function(state) {
 			axios.get("/note")

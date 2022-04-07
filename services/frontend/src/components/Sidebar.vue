@@ -74,12 +74,6 @@
 							</button>
 						</li>
 					</ul>
-					<div class="sidebar__filter" v-if="getInLogin">
-						<SelectImportance />
-					</div>
-					<div class="sidebar__filter" v-if="getInLogin">
-						<ImportanceLevels />
-					</div>
 				</div>
 			</div>
 		</div>
@@ -92,16 +86,9 @@ import {
 	mapMutations
 } from "vuex";
 
-import ImportanceLevels from "@/components/filters/ImportanceLevels";
-import SelectImportance from "@/components/filters/SelectImportance";
-
 
 export default {
 	name: "Sidebar",
-	components: {
-		ImportanceLevels,
-		SelectImportance
-	},
 	methods: {
 		...mapMutations([
 			"setShowNoteForm",

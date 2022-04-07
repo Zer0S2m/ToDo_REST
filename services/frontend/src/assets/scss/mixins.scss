@@ -14,24 +14,6 @@
 	}
 }
 
-@mixin check-importance-level-before($color-importance) {
-	color: $color-importance;
-
-	&::before {
-		background-color: $color-importance;
-	}
-}
-
-@mixin check-importance-level($color-importance) {
-	&::before {
-		border: 2px solid $color-importance;
-	}
-
-	&:hover {
-		color: $color-importance;
-	}
-}
-
 
 @mixin importance-radio-form-note($color-importance) {
 	background-color: $color-importance;

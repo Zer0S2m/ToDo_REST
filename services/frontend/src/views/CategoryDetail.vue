@@ -1,38 +1,32 @@
 <template>
 	<div class="container">
-		<ul class="notes-items">
-			<NoteItem
-				v-for="note in getNotes" :key="note.id"
-				:note="note"
-			>
-			</NoteItem>
-		</ul>
+		<div class="df just-between">
+			<NoteItems :levelImportance=0 title-level="Usual" />
+			<NoteItems :levelImportance=1 title-level="Easy" />
+			<NoteItems :levelImportance=2 title-level="Important" />
+			<NoteItems :levelImportance=3 title-level="Urgently" />
+		</div>
 	</div>
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapMutations } from "vuex";
 
-import NoteItem from "@/components/NoteItem";
+import NoteItems from "@/components/NoteItems";
 
 
 export default {
 	name: "CategoryDetail",
 	components: {
-		NoteItem,
+		NoteItems,
 	},
-	computed: {
-		...mapGetters([
-			"getNotesCategory",
-			"getFilteredNotesByImportance",
-			"getFilteredNotesByImportanceLevels"
-		]),
-		getNotes: function() {
-			let notes = this.getNotesCategory(this.$route.params.slug);
-			notes = this.getFilteredNotesByImportance(notes);
-			notes = this.getFilteredNotesByImportanceLevels(notes);
-			return notes;
-		}
+	methods: {
+		...mapMutations([
+			"setCategoriesFilter"
+		])
 	},
+	created() {
+		this.setCategoriesFilter([this.$route.params.slug]);
+	}
 }
 </script>

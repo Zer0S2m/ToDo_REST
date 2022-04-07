@@ -1,11 +1,85 @@
-.notes-items {
-	display: flex;
-	flex-wrap: wrap;
-	column-gap: 16px;
+.wrapper-notes-items {
+	max-width: 24%;
+	width: 100%;
+}
+
+.add-notes {
+
+	&-area {
+		padding: 10px 12px;
+		margin-bottom: 12px;
+		border-radius: 2px;
+
+		&.add-notes-area-0 {
+			background-color: rgba($color-importance-0, 0.25);
+
+			.add-notes-title {
+				color: darken($color-importance-0, 20);
+
+				&::before {
+					background-color: darken($color-importance-0, 20);
+				}
+			}
+		}
+
+		&.add-notes-area-1 {
+			background-color: rgba($color-importance-1, 0.25);
+			
+			.add-notes-title {
+				color: darken($color-importance-1, 20);
+
+				&::before {
+					background-color: darken($color-importance-1, 20);
+				}
+			}
+		}
+
+		&.add-notes-area-2 {
+			background-color: rgba($color-importance-2, 0.25);
+
+			.add-notes-title {
+				color: darken($color-importance-2, 20);
+
+				&::before {
+					background-color: darken($color-importance-2, 20);
+				}
+			}
+		}
+
+		&.add-notes-area-3 {
+			background-color: rgba($color-importance-3, 0.25);
+
+			.add-notes-title {
+				color: darken($color-importance-3, 20);
+
+				&::before {
+					background-color: darken($color-importance-3, 20);
+				}
+			}
+		}
+	}
+
+	&-title {
+		font-weight: 500;
+		font-size: 16px;
+		padding-left: 16px;
+
+		position: relative;
+
+		&::before {
+			position: absolute;
+			content: "";
+			width: 10px;
+			height: 10px;
+			left: 0;
+			top: 50%;
+			transform: translateY(-50%);
+			border-radius: 50%;
+		}
+	}
 }
 
 .note {
-	max-width: 32%;
 	width: 100%;
 	margin-bottom: 20px;
 	background-color: $color-white;
@@ -57,7 +131,7 @@
 	&-date {
 		font-size: 12px;
 		font-weight: 500;
-    opacity: 0.5;
+		opacity: 0.5;
 	}
 
 	&-delete {

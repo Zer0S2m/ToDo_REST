@@ -75,6 +75,9 @@ export default {
 		]),
 		toDeleteNote() {
 			this.deleteNote(this.note.id);
+			this.$router.push({
+				name: "ListNotes"
+			});
 		},
 		editNote() {
 			this.setShowNoteForm(true);
