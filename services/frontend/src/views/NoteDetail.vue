@@ -71,7 +71,8 @@ export default {
 		]),
 		...mapMutations([
 			"setActionForFormNote",
-			"setShowNoteForm"
+			"setShowNoteForm",
+			"setDataEdit"
 		]),
 		toDeleteNote() {
 			this.deleteNote(this.note.id);
@@ -82,6 +83,12 @@ export default {
 		editNote() {
 			this.setShowNoteForm(true);
 			this.setActionForFormNote("edit");
+			this.setDataEdit({
+				titleNote: this.note.titleNote,
+				textNote: this.note.textNote,
+				categorySlug: this.note.categorySlug,
+				importance: this.note.importance
+			});
 		},
     forceFileDownload(response){
       const url = window.URL.createObjectURL(

@@ -1,5 +1,5 @@
 <template>
-	<div v-show="getShowNoteForm && getInLogin" class="popup">
+	<div v-show="getShowNoteForm" v-if="getInLogin" class="popup">
 		<div class="popup-wrapper">
 			<div class="popup-container">
 				<button
@@ -155,7 +155,8 @@ export default {
 	methods: {
 		...mapMutations([
 			"setShowNoteForm",
-			"setActionForFormNote"
+			"setActionForFormNote",
+			"cleanDataEdit"
 		]),
 		...mapActions([
 			"createNote",
@@ -214,8 +215,22 @@ export default {
 			"getNotes",
 			"getNote",
 			"getCategories",
-			"getInLogin"
+			"getInLogin",
+			"getDataEdit"
 		])
+	},
+	watch: {
+		getShowNoteForm(isShow) {
+			if ( isShow && this.getActionForm === "edit" ) {
+				const data = this.getDataEdit;
+				this.titleNote = data.titleNote;
+				this.textNote = data.textNote;
+				this.categorySlug = (data.categorySlug) ? data.categorySlug : "";
+				this.importance = data.importance;
+			} else {
+				this.cleanDataEdit();
+			}
+		}
 	}
 }
 </script>

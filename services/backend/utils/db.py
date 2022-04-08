@@ -135,11 +135,6 @@ async def editing_note(
 		else:
 			note_edit.category_id = 0
 
-		if note.importance == None:
-			note_edit.importance = 0
-		elif int(note.importance) != 0:
-			note_edit.importance = note.importance
-
 		if data_file:
 			await delete_file_storage(note.file_name)
 			await deleting_file_db(session, note.file_name)
@@ -147,6 +142,7 @@ async def editing_note(
 			note_edit.id_file = data_file["id_file"]
 			note.file_name = data_file["file_name"]
 
+		note_edit.importance = note.importance
 		note_edit.title = note.title
 		note_edit.text = note.text
 

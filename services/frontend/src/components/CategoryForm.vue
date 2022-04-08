@@ -1,5 +1,5 @@
 <template>
-	<div v-show="getIsShowFormCategory && getInLogin" class="popup">
+	<div v-show="getIsShowFormCategory" v-if="getInLogin" class="popup">
 		<div class="popup-wrapper">
 			<div class="popup-container">
 				<button

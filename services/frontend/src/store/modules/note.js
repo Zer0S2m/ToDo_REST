@@ -6,6 +6,12 @@ export default {
 		isShowNoteForm: false,
 		actionForm: false,
 		notes: [],
+		dataEdit: {
+			titleNote: "",
+			textNote: "",
+			categorySlug: "",
+			importance: 0
+		}
 	},
 	mutations: {
 		setShowNoteForm: function(state, val) {
@@ -42,7 +48,18 @@ export default {
 			state.notes.map((note) => {
 				if ( note.categorySlug === categorySlug ) note.categorySlug = null;
 			});
-		}
+		},
+		setDataEdit(state, data) {
+			state.dataEdit = data;
+		},
+		cleanDataEdit(state) {
+			state.dataEdit = {
+				titleNote: "",
+				textNote: "",
+				categorySlug: "",
+				importance: 0
+			}
+		},
 	},
 	actions: {
 		deleteNote: function(state, id) {
@@ -151,8 +168,8 @@ export default {
 		getActionForm(state) {
 			return state.actionForm;
 		},
-		getNotesCategory: (state) => (slug) => {
-			return state.notes.filter(note => note.categorySlug === slug);
+		getDataEdit(state) {
+			return state.dataEdit;
 		}
 	},
 }

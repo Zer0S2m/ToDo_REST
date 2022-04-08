@@ -3,36 +3,36 @@
 		class="note"
 		:class="getClassImportance"
 	>
-	<div class="note-wrapper df h100">
-		<div class="note-content df column just-between w100">
-			<div class="note-area">
-				<div class="note-date df al-it-center just-between w100">
-					<time>{{ note.pubDate }}</time>
-					<button
-						type="button"
-						class="note-delete df"
-						@click="deleteNote(note.id)"
+		<div class="note-wrapper df h100">
+			<div class="note-content df column just-between w100">
+				<div class="note-area">
+					<div class="note-date df al-it-center just-between w100">
+						<time>{{ note.pubDate }}</time>
+						<button
+							type="button"
+							class="note-delete df"
+							@click="deleteNote(note.id)"
+						>
+							<img src="@/assets/img/delete-note.svg" alt="" class="note-delete-img">
+						</button>
+					</div>
+					<h4 class="note-title">{{ note.titleNote }}</h4>
+					<div class="note-text">
+						<p>
+							{{ note.textNote }}
+						</p>
+					</div>
+				</div>
+				<div class="note-back-link df">
+					<router-link
+						:to="{ name: 'NoteDetail', params: { id: note.id } }"
+						class="note-link df primary-btn"
 					>
-						<img src="@/assets/img/delete-note.svg" alt="" class="note-delete-img">
-					</button>
+						More
+					</router-link>
 				</div>
-				<h4 class="note-title">{{ note.titleNote }}</h4>
-				<div class="note-text">
-					<p>
-						{{ note.textNote }}
-					</p>
-				</div>
-			</div>
-			<div class="note-back-link df">
-				<router-link
-					:to="{ name: 'NoteDetail', params: { id: note.id } }"
-					class="note-link df primary-btn"
-				>
-					More
-				</router-link>
 			</div>
 		</div>
-	</div>
 	</li>
 </template>
 
