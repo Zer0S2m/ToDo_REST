@@ -1,4 +1,3 @@
-from email.policy import default
 from sqlalchemy import (
 	Column, Integer, String,
 	DateTime, Text, ForeignKey
@@ -13,7 +12,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
 
 from config import (
-    BD_NAME, LIMIT_TITLE, LIMIT_TEXT
+    BD_NAME, LIMIT_NOTE_TITLE, LIMIT_NOTE_TEXT,
+    LIMIT_CATEGORY_TITLE, LIMIT_CATEGORY_SLUG
 )
 
 
@@ -28,18 +28,19 @@ class Note(Base):
     __tablename__ = "note"
 
     id = Column(Integer, primary_key = True, unique = True)
-    title = Column(String(LIMIT_TITLE), default = False)
-    text = Column(Text(LIMIT_TEXT), nullable = False)
+    title = Column(String(LIMIT_NOTE_TITLE), default = False)
+    text = Column(Text(LIMIT_NOTE_TEXT), nullable = False)
     pub_date = Column(DateTime)
     importance = Column(Integer, default = 0)
+    file_id = Column(Integer, ForeignKey('file.id', ondelete = "CASCADE"), default = False)
     file = relationship("File", backref = "note_file", cascade = "all, delete")
-    id_file = Column(Integer, ForeignKey('file.id', ondelete = "CASCADE"), default = False)
     user_id = Column(Integer, ForeignKey('user.id'))
     category_id = Column(Integer, ForeignKey('category.id', ondelete = "CASCADE"), nullable = True, default = None)
+    category = relationship("Category", back_populates = "notes", cascade = "all, delete")
 
 
     def __repr__(self) -> str:
-        return f"<id: {self.id}> - <title: {self.title}>"
+        return f"id: {self.id} - title: {self.title}"
 
 
 class File(Base):
@@ -52,20 +53,21 @@ class File(Base):
 
 
     def __repr__(self) -> str:
-        return f"<id: {self.id}> - <title: {self.file_name}>"
+        return f"id: {self.id} - title: {self.file_name}"
 
 
 class Category(Base):
     __tablename__ = "category"
 
     id = Column(Integer, primary_key = True, unique = True)
-    title = Column(String, nullable = False)
-    slug = Column(String, unique = True, nullable = False)
+    title = Column(String(LIMIT_CATEGORY_TITLE), nullable = False)
+    slug = Column(String(LIMIT_CATEGORY_SLUG), unique = True, nullable = False)
     user_id = Column(Integer, ForeignKey('user.id'))
+    notes = relationship("Note", back_populates = "category")
 
 
     def __repr__(self) -> str:
-        return f"<title: {self.title}> - <slug: {self.slug}>"
+        return f"title: {self.title} - slug: {self.slug}"
 
 
 class User(Base):
@@ -81,4 +83,4 @@ class User(Base):
 
 
     def __repr__(self) -> str:
-        return f"<id: {self.id}> - <username: {self.username}>"
+        return f"id: {self.id} - username: {self.username}"

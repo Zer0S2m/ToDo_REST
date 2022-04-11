@@ -8,6 +8,7 @@ from datetime import datetime
 from fastapi import UploadFile
 
 from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
 
 from models import (
 	Note, File, User,
@@ -42,13 +43,17 @@ async def get_notes(
 
 	async with Session.begin() as session:
 		result = await session.execute(
-			select(Note).filter_by(user_id = current_user.user_id)
+			select(Note)
+			.filter_by(user_id = current_user.user_id)
+			.options(selectinload(Note.file), selectinload(Note.category))
 		)
 		for note in result.scalars():
-			category_slug = await get_category(current_user, category_id = note.category_id)
-			if category_slug:
-				category_slug = category_slug.slug
-			file_name = await get_file_name(session, note.id_file)
+			category_slug = None
+			file_name = None
+			if note.category:
+				category_slug = note.category.slug
+			if note.file:
+				file_name = note.file.file_name
 			notes.append(create_note_schema(note, file_name, category_slug))
 
 	return notes
@@ -60,14 +65,18 @@ async def get_note(
 ) -> Union[None, NoteSchema]:
 	async with Session.begin() as session:
 		note = await session.execute(
-			select(Note).filter_by(id = note_id, user_id = current_user.user_id)
+			select(Note)
+			.filter_by(id = note_id, user_id = current_user.user_id)
+			.options(selectinload(Note.file), selectinload(Note.category))
 		)
 		note = note.scalars().first()
+		file_name = None
+		category_slug = None
 		if note:
-			category_slug = await get_category(current_user, category_id = note.category_id)
-			if category_slug:
-				category_slug = category_slug.slug
-			file_name = await get_file_name(session, note.id_file)
+			if note.category:
+				category_slug = note.category.slug
+			if note.file:
+				file_name = note.file.file_name
 			note = create_note_schema(note, file_name, category_slug)
 
 	return note
@@ -75,7 +84,7 @@ async def get_note(
 
 async def creating_note(
 	note: NoteCreate,
-	id_file: int,
+	file_id: int,
 	file_name: Union[str, bool],
 	current_user: UserInDB
 ) -> NoteSchema:
@@ -88,8 +97,8 @@ async def creating_note(
 			user_id = current_user.user_id,
 			importance = note.importance
 		)
-		if id_file:
-			new_note.id_file = id_file
+		if file_id:
+			new_note.file_id = file_id
 		if note.category_slug:
 			category = await get_category(current_user, slug = note.category_slug)
 			new_note.category_id = category.id
@@ -106,12 +115,15 @@ async def deleting_note(
 ):
 	async with Session() as session:
 		result = await session.execute(
-			select(Note).filter_by(id = note.id, user_id = current_user.user_id)
+			select(Note)
+			.filter_by(id = note.id, user_id = current_user.user_id)
+			.options(selectinload(Note.file))
 		)
 		deleted_note = result.scalars().first()
-		file_name = await get_file_name(session, deleted_note.id_file)
 
-		await delete_file_storage(file_name)
+		if deleted_note.file:
+			file_name = deleted_note.file.file_name
+			await delete_file_storage(file_name)
 
 		await session.delete(deleted_note)
 		await session.commit()
@@ -139,7 +151,7 @@ async def editing_note(
 			await delete_file_storage(note.file_name)
 			await deleting_file_db(session, note.file_name)
 
-			note_edit.id_file = data_file["id_file"]
+			note_edit.file_id = data_file["file_id"]
 			note.file_name = data_file["file_name"]
 
 		note_edit.importance = note.importance
@@ -155,14 +167,12 @@ async def deleting_file_db(
 	session: Session,
 	file_name: str
 ):
-	result = await session.execute(
+	file = await session.execute(
 		select(File).filter_by(file_name = file_name)
 	)
-	if result:
-		deleted_file = result.scalars().first()
-		if deleted_file:
-			await session.delete(deleted_file)
-			await session.commit()
+	file = file.scalars().first()
+	await session.delete(file)
+	await session.commit()
 
 
 async def get_file(
@@ -195,20 +205,6 @@ async def creating_file_note(
 	return new_file.id
 
 
-async def get_file_name(
-	session: Session,
-	id_file: int
-) -> str:
-	file_name = await session.execute(
-		select(File).filter_by(id = id_file)
-	)
-	file_name = file_name.scalars().first()
-	if file_name:
-		file_name = file_name.file_name
-
-	return file_name
-
-
 async def set_file_note(
 	file: UploadFile,
 	current_user: UserInDB
@@ -223,11 +219,11 @@ async def set_file_note(
 		file_path = os.path.join(MEDIA_DIR, file.filename)
 		file_name = file.filename
 
-	id_file = await creating_file_note(file_path, file_name, current_user)
+	file_id = await creating_file_note(file_path, file_name, current_user)
 	await writing_file(file, file_path)
 
 	return {
-		"id_file": id_file,
+		"file_id": file_id,
 		"file_name": file_name
 	}
 
@@ -319,17 +315,20 @@ async def get_notes_category(
 	current_user: UserInDB
 ) -> List[NoteSchema]:
 	notes = []
-	category = await get_category(current_user, slug = slug)
 
 	async with Session.begin() as session:
-		result = await session.execute(
-			select(Note).filter_by(user_id = current_user.user_id, category_id = category.id)
+		category = await session.execute(
+			select(Category, Note)
+			.filter_by(user_id = current_user.user_id, slug = slug)
+			.options(selectinload(Category.notes), selectinload(Note.file))
 		)
-		for note in result.scalars():
-			if category:
-				category_slug = category.slug
-			file_name = await get_file_name(session, note.id_file)
-			notes.append(create_note_schema(note, file_name, category_slug))
+		category = category.scalars().first()
+
+		for note in category.notes:
+			file_name = None
+			if note.file:
+				file_name = note.file.file_name
+			notes.append(create_note_schema(note, file_name, category.slug))
 
 	return notes
 
@@ -364,6 +363,5 @@ async def delete_category(
 			select(Category).filter_by(slug = slug, user_id = current_user.user_id)
 		)
 		deleted_category = deleted_category.scalars().first()
-		if deleted_category:
-			await session.delete(deleted_category)
-			await session.commit()
+		await session.delete(deleted_category)
+		await session.commit()

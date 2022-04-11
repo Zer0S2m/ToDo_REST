@@ -7,7 +7,7 @@
 			<div class="note-content df column just-between w100">
 				<div class="note-area">
 					<div class="note-date df al-it-center just-between w100">
-						<time>{{ note.pubDate }}</time>
+						<time>{{ getPubDate }}</time>
 						<button
 							type="button"
 							class="note-delete df"
@@ -53,6 +53,17 @@ export default {
 	computed: {
 		getClassImportance: function() {
 			return `importance-${this.note.importance}`;
+		},
+		getPubDate: function() {
+			const options = {
+				year: 'numeric', month: 'numeric', day: 'numeric',
+				hour: 'numeric', minute: 'numeric',
+				hour12: false
+			};
+			let date = new Intl.DateTimeFormat("en-US", options).format(new Date(this.note.pubDate));
+			date = date.replace(/[/]/g, ".");
+
+			return date;
 		}
 	}
 }

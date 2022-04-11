@@ -14,7 +14,10 @@
 						class="popup-form"
 						@submit.prevent=submit
 					>
-						<div class="popup-form-block df column">
+						<div
+							class="popup-form-block df column"
+							:class="{'primary-error-block': error.title}"
+						>
 							<label for="title-note" class="primary-label popup-form-label">Title</label>
 							<input
 								id="title-note"
@@ -22,14 +25,23 @@
 								type="text"
 								class="primary-input popup-form-input"
 								placeholder="Title"
+								@input="validateTitle"
 							>
 							<div class="primary-text-form">
 								<p>
 									Title is not required
 								</p>
 							</div>
+							<div class="primary-error-body">
+								<p>
+									{{ error.title }}
+								</p>
+							</div>
 						</div>
-						<div class="popup-form-block df column">
+						<div
+							class="popup-form-block df column"
+							:class="{'primary-error-block': error.text}"
+						>
 							<label for="text-note" class="primary-label popup-form-label">Description</label>
 							<textarea
 								v-model="textNote"
@@ -39,7 +51,13 @@
 								class="primary-input popup-form-input"
 								placeholder="Text"
 								required
+								@input="validateText"
 							></textarea>
+							<div class="primary-error-body">
+								<p>
+									{{ error.text }}
+								</p>
+							</div>
 						</div>
 						<div class="popup-form-block df column">
 							<label for="category-note" class="primary-label popup-form-label">Category</label>
@@ -150,6 +168,8 @@ export default {
 			],
 			fileTextBase: "No file choice",
 			fileText: "No file choice",
+			error: {},
+			isValidate: false
 		}
 	},
 	methods: {
@@ -163,7 +183,7 @@ export default {
 			"editNote"
 		]),
 		submit() {
-			if ( !this.textNote ) {
+			if ( !this.textNote || (this.error.title || this.error.text) ) {
 				return;
 			};
 			const data = {
@@ -206,6 +226,8 @@ export default {
 			this.categorySlug = "";
 			this.importance = 0;
 			this.fileText = this.fileTextBase;
+			this.error = {};
+			this.isValidate = false;
 		},
 	},
 	computed: {
@@ -217,7 +239,23 @@ export default {
 			"getCategories",
 			"getInLogin",
 			"getDataEdit"
-		])
+		]),
+		validateTitle: function() {
+			if ( this.titleNote.length > 255 ) {
+				this.error.title = "The maximum number of characters for the title is - 255";
+			}
+			else {
+				this.error.title = "";
+			}
+		},
+		validateText: function() {
+			if ( this.textNote.length > 1000 ) {
+				this.error.text = "The maximum number of characters for the text is - 1000";
+			}
+			else {
+				this.error.text = "";
+			}
+		},
 	},
 	watch: {
 		getShowNoteForm(isShow) {

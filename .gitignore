@@ -11,3 +11,4 @@ __pycache__
 db_todo.db
 db
 media
+vetur.config.js

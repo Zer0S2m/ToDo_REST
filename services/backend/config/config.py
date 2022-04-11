@@ -6,8 +6,11 @@ from fastapi.security import OAuth2PasswordBearer
 
 
 BD_NAME = "db_todo"
-LIMIT_TITLE = 255
-LIMIT_TEXT = 1000
+LIMIT_NOTE_TITLE = 255
+LIMIT_NOTE_TEXT = 1000
+LIMIT_CATEGORY_TITLE = 50
+LIMIT_CATEGORY_SLUG = 50
+LIMIT_USERNAME = 50
 
 BASEDIR = os.getcwd()
 MEDIA = "media"

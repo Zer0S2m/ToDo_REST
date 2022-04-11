@@ -11,15 +11,18 @@
 				</button>
 				<div class="popup-area">
 					<form
-					@submit.prevent="submit"
+						@submit.prevent="submit"
 						class="popup-form"
 					>
-						<div class="primary-error-form" v-if="error">
+						<div class="primary-error-form" v-if="error.server">
 							<p>
-								{{ error }}
+								{{ error.server }}
 							</p>
 						</div>
-						<div class="popup-form-block df column">
+						<div
+							class="popup-form-block df column"
+							:class="{'primary-error-block': error.title}"
+						>
 							<label for="title-category" class="primary-label popup-form-label">Title</label>
 							<input
 								required
@@ -28,9 +31,18 @@
 								type="text"
 								class="primary-input popup-form-input"
 								placeholder="Title"
+								@input="validateTitle"
 							>
+							<div class="primary-error-body">
+								<p>
+									{{ error.title }}
+								</p>
+							</div>
 						</div>
-						<div class="popup-form-block df column">
+						<div
+							class="popup-form-block df column"
+							:class="{'primary-error-block': error.slug}"
+						>
 							<label for="slug-category" class="primary-label popup-form-label">Slug</label>
 							<input
 								required
@@ -39,13 +51,16 @@
 								type="text"
 								class="primary-input popup-form-input"
 								placeholder="Slug"
+								@input="validateSlug"
 							>
+							<div class="primary-error-body">
+								<p>
+									{{ error.slug }}
+								</p>
+							</div>
 						</div>
 						<div class="popup-form-block df al-it-center">
-							<button
-								type="submit"
-								class="primary-btn-form"
-							>
+							<button type="submit" class="primary-btn-form">
 								Send
 							</button>
 							<button
@@ -77,7 +92,8 @@ export default {
 		return {
 			titleCategory: "",
 			slugCategory: "",
-			error: ""
+			error: {},
+			isValidate: false
 		}
 	},
 	methods: {
@@ -88,7 +104,7 @@ export default {
 			"createCategory"
 		]),
 		submit() {
-			if ( !(this.titleCategory && this.slugCategory) ) {
+			if ( !(this.titleCategory && this.slugCategory) || !this.isValidate ) {
 				return;
 			};
 
@@ -98,7 +114,7 @@ export default {
 			})
 			.then((res) => {
 				if ( res ) {
-					this.error = res.detail;
+					this.error.server = res.detail;
 				} else  {
 					this.closeForm();
 				};
@@ -108,14 +124,35 @@ export default {
 			this.setShowFormCategory(false);
 			this.titleCategory = "";
 			this.slugCategory = "";
-			this.error = "";
+			this.error = {};
+			this.isValidate = false;
 		}
 	},
 	computed: {
 		...mapGetters([
 			"getIsShowFormCategory",
 			"getInLogin"
-		])
+		]),
+		validateTitle: function() {
+			if ( this.titleCategory.length > 50 ) {
+				this.error.title = "The maximum number of characters for the title is - 50";
+				this.isValidate = false;
+			}
+			else {
+				this.error.title = "";
+				this.isValidate = true;
+			}
+		},
+		validateSlug: function() {
+			if ( this.slugCategory.length > 50 ) {
+				this.error.slug = "The maximum number of characters for the slug is - 50";
+				this.isValidate = false;
+			}
+			else {
+				this.error.slug = "";
+				this.isValidate = true;
+			}
+		}
 	}
 }
 </script>

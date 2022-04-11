@@ -7,11 +7,15 @@ from datetime import datetime
 from pydantic import BaseModel
 from pydantic import Field
 
+from config import (
+    LIMIT_NOTE_TEXT, LIMIT_NOTE_TITLE
+)
+
 
 class BaseNote(BaseModel):
-    title: Optional[str] = Field(None, alias = "titleNote")
-    text: Optional[str] = Field(alias = "textNote")
-    pub_date: Union[datetime, str] = Field(alias = "pubDate", default = datetime.now())
+    title: Optional[str] = Field(None, alias = "titleNote", max_length = LIMIT_NOTE_TITLE)
+    text: Optional[str] = Field(alias = "textNote", max_length = LIMIT_NOTE_TEXT)
+    pub_date: Optional[datetime] = Field(alias = "pubDate", default = datetime.now())
     category_slug: Optional[str] = Field(None, alias = "categorySlug")
     importance: Optional[int] = Field(None)
 

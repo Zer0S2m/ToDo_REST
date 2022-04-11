@@ -1,6 +1,9 @@
 from typing import Optional
 
 from pydantic import BaseModel
+from pydantic import Field
+
+from config import LIMIT_USERNAME
 
 
 class Token(BaseModel):
@@ -13,7 +16,7 @@ class TokenData(BaseModel):
 
 
 class UserBase(BaseModel):
-    username: str
+    username: str = Field(max_length = LIMIT_USERNAME)
     email: Optional[str] = None
 
 

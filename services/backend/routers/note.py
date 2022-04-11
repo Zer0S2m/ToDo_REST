@@ -50,7 +50,7 @@ async def list_notes(current_user: UserInDB = Depends(get_current_user)):
 @router.get(
 	"/{note_id:int}",
 	response_model = NoteSchema,
-	response_model_exclude = {"id_file"}
+	response_model_exclude = {"file_id"}
 )
 async def get_note_api(
 	note_id: int,
@@ -97,15 +97,15 @@ async def create_note(
 	file: UploadFile = File(None),
 	current_user: UserInDB = Depends(get_current_user)
 ) -> NoteSchema:
-	id_file = 0
+	file_id = 0
 	file_name = False
 
 	if file:
 		data_file = await set_file_note(file, current_user)
-		id_file = data_file["id_file"]
+		file_id = data_file["file_id"]
 		file_name = data_file["file_name"]
 
-	note = await creating_note(note, id_file, file_name, current_user)
+	note = await creating_note(note, file_id, file_name, current_user)
 	return note
 
 

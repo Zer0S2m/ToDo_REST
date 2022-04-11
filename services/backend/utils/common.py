@@ -1,6 +1,5 @@
 import os
 import time
-from datetime import datetime
 from typing import Union
 
 import aiofiles
@@ -49,10 +48,6 @@ async def writing_file(
 		await f.write(contents)
 
 
-def get_pub_date_note(date: datetime) -> str:
-	return f'{date.strftime("%d.%m.%Y")} {date.strftime("%H:%M")}'
-
-
 def create_slug_category(
 	slug: str,
 	user_id: int
@@ -70,7 +65,7 @@ def create_note_schema(
         titleNote = note.title,
         textNote = note.text,
         idNote = note.id,
-        pubDate = get_pub_date_note(note.pub_date),
+        pubDate = note.pub_date,
         fileName = file_name,
 		categorySlug = category_slug,
 		importance = note.importance

@@ -1,0 +1,102 @@
+.primary-input {
+	padding: 12px 0 6px;
+	width: 100%;
+	border-bottom: 1px solid rgba($color-black, 0.3);
+
+	font-size: 14px;
+	font-family: "Roboto", sans-serif;
+	resize: none;
+
+	transition: $animate;
+
+	&:focus {
+		border-bottom: 1px solid rgba($color-black, 0.5);
+		box-shadow: 0 1px 0 0 rgba($color-black, 0.5);
+	}
+}
+
+.primary-error-form {
+	margin-bottom: 16px;
+
+	p {
+		color: $color-importance-3;
+	}
+}
+
+.primary-error-block {
+	.primary-error-body {
+		display: block;
+	}
+
+	.primary-input {
+		color: $color-importance-3;
+		border-bottom: 1px solid rgba($color-importance-3, 0.3);
+
+		&:focus {
+			border-bottom: 1px solid rgba($color-importance-3, 0.5);
+			box-shadow: 0 1px 0 0 rgba($color-importance-3, 0.5);
+		}
+	}
+}
+
+.primary-error-body {
+	display: none;
+	margin-top: 12px;
+
+	p	{
+		color: $color-importance-3;
+	}
+}
+
+.primary-input-error {
+	margin-top: 12px;
+
+	p {
+		color: $color-importance-3;
+	}
+}
+
+.primary-label {
+	font-size: 18px;
+}
+
+.primary-select {
+	font-size: 14px;
+
+	padding: 12px 0 6px;
+	border-bottom: 1px solid rgba($color-black, 0.3);
+}
+
+.primary-text-form {
+	font-size: 14px;
+	opacity: 0.5;
+	margin-top: 12px;
+}
+
+.primary-btn-form {
+	padding: 8px 20px;
+	border-radius: 2px;
+	background-color: $primary-color-5;
+	transition: $animate;
+
+	color: $color-white;
+	font-size: 14px;
+	font-weight: 500;
+
+	display: flex;
+
+	&:hover {
+		background-color: darken($primary-color-5, 10%);
+	}
+}
+
+.primary-btn-form-cancel {
+	padding: 8px 20px;
+	font-size: 14px;
+
+	transition: $animate;
+
+	&:hover {
+		color: $color-importance-3;
+	}
+}
