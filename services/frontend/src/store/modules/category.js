@@ -1,76 +1,85 @@
 import axios from "axios";
 
+import router from "@/router";
+
 
 export default {
 	store: {
-		categories: [],
 		isShowFormCategory: false
 	},
 	mutations: {
-		setCategories: function(state, val) {
-			state.categories = val;
-		},
-		setShowFormCategory: function(state, val) {
+		setShowFormCategory(state, val) {
 			state.isShowFormCategory = val;
 		},
-		addCategory: function(state, category) {
-			state.categories.push(category);
+		deleteCategory(state, { category, indexArr, listProjects }) {
+			listProjects.projectDetail.categories.splice(indexArr, 1);
+			listProjects.projectBase.categories.splice(indexArr, 1);
 		},
-		deleteCategory: function(state, id) {
-			state.categories.splice(id, 1);
+		createCategory(state, { newCategory, listProjects }) {
+			listProjects.projectDetail.categories.push(newCategory);
+			listProjects.projectBase.categories.push(newCategory);
 		}
 	},
 	actions: {
-		createCategory: async function(state, data) {
+		async getNotesCategory(state, { slugProject, slugCategory }) {
+			state.commit("lockUi");
+			let notes = [];
+
+			await axios.get(`/project/${slugProject}/category/${slugCategory}`)
+				.then((res) => {
+					notes = res.data;
+				})
+				.catch((error) => {
+					console.error(error);
+				})
+
+			state.commit("unlockUi");
+			return notes;
+		},
+		async createCategory(state, { category, slugProject }) {
+			const listProjects = state.getters.getProjectDetailAndBase(slugProject);
+			category.projectId = listProjects.projectDetail.id;
 			let errorCategory;
 
-			await axios.post("/category/create", data)
-			.then((res) => {
-				state.commit("addCategory", res.data);
-			})
-			.catch((error) => {
-				errorCategory = error.response.data;
-			});
+			await axios.post(`/project/${slugProject}/category/create`, category)
+				.then((res) => {
+					const newCategory = res.data;
+					state.commit("createCategory", { newCategory, listProjects });
+				})
+				.catch((error) => {
+					errorCategory = error.response.data;
+				});
 
 			return errorCategory;
 		},
-		deleteCategory: function(state, category) {
-			axios.delete("/category/delete", {
+		deleteCategory(state, { category, slugProject, indexArr }) {
+			axios.delete(`/project/${slugProject}/category/delete`, {
 				data: {
 					slug: category.slug
 				}
 			})
 			.then((res) => {
-				const resCategoryId = state.getters.getCategory(category.slug);
-				state.commit("deleteCategory", resCategoryId);
-				state.commit("deleteCategoryInNotes", category.slug);
+				const listProjects = state.getters.getProjectDetailAndBase(slugProject);
+				state.commit("deleteCategory", { category, indexArr, listProjects });
 			})
 			.catch((error) => {
 				console.error(error);
 			});
 		},
-		getCategories: function(state) {
-			axios.get("/category")
-			.then((res) => {
-				state.commit("setCategories", res.data.categories)
-			})
-			.catch((error) => {
-				state.dispatch("logoutUser");
-			});
-		},
 	},
 	getters: {
-		getCategories(state) {
-			return state.categories;
+		getIsShowFormCategory: state => state.isShowFormCategory,
+		getNotesByPart: state => (notes, idPart) => notes.filter(note => note.partId === idPart),
+		getCategoriesByProject(state, getters) {
+			const projectBase = getters.getProjectBase(router.currentRoute.value.params.slugProject);
+			if ( projectBase ) return projectBase.categories;
 		},
-		getIsShowFormCategory(state) {
-			return state.isShowFormCategory;
-		},
-		getCategory: (state) => (slug) => {
-			return state.categories.indexOf(state.categories.find(category => category.slug === slug));
-		},
-		getCategoryTitle: (state) => (slug) => {
-			return state.categories.find(category => category.slug === slug).title;
+		getNotesByCategory(state, getters) {
+			const currentSlugCategory = router.currentRoute.value.params.slugCategory;
+			const partsDetail = getters.getPartsDetail;
+			let notes = partsDetail.map(partDetail => partDetail.notes).flat();
+			notes = notes.filter(note => note.category.slug === currentSlugCategory);
+			return notes;
 		}
 	}
 }

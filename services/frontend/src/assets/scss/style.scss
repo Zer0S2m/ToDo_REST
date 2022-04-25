@@ -6,13 +6,21 @@
 @import "./common";
 @import "./form";
 
-@import "./views/form";
+@import "./views/formUser";
 @import "./views/noteDetail";
+@import "./views/projectDetail";
+@import "./views/partDetail";
+@import "./views/categoryDetail";
 
 @import "./components/sidebar";
 @import "./components/navbar";
-@import "./components/noteItem";
-@import "./components/categoryItem";
-@import "./components/noteForm";
+@import "./components/loader";
 
-@import "./components/filters/searchInput";
+@import "./components/note/noteItem";
+@import "./components/note/noteForm";
+
+@import "./components/category/categoryItem";
+
+@import "./components/project/projectItem";
+@import "./components/project/partItem";
+@import "./components/project/commentItem";

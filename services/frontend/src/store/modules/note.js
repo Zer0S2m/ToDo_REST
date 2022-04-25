@@ -1,101 +1,114 @@
 import axios from "axios"
 
+import router from "@/router";
+
 
 export default {
 	state: {
-		isShowNoteForm: false,
+		isShowFormNote: false,
 		actionForm: false,
-		notes: [],
 		dataEdit: {
 			titleNote: "",
 			textNote: "",
 			categorySlug: "",
 			importance: 0
-		}
+		},
+		additionalDataForm: {},
 	},
 	mutations: {
-		setShowNoteForm: function(state, val) {
-			state.isShowNoteForm = val;
+		setShowFormNote(state, val) {
+			state.isShowFormNote = val;
 		},
-		setActionForFormNote: function(state, val) {
+		setAdditionalDataForm(state, data) {
+			state.additionalDataForm = data;
+		},
+		setActionForFormNote(state, val) {
 			state.actionForm = val;
 		},
-		addNote: function(state, note) {
-			state.notes.push(note);
+		addNote(state, { partDetail, note }) {
+			if ( partDetail ) partDetail.notes.unshift(note);
 		},
-		deleteNote: function(state, idNote) {
-			state.notes.splice(idNote, 1);
-		},
-		editNote: function(state, data) {
-			const editNote = state.notes[data.note.id];
-
-			editNote.titleNote = data.titleNote;
-			editNote.textNote = data.textNote;
-			editNote.categorySlug = data.categorySlug;
-			editNote.importance = data.importance;
-			if ( data.fileName ) editNote.fileName = data.fileName;
-		},
-		setNotes(state, notes) {
-			state.notes = notes;
-		},
-		updateNotes(state, id) {
-			for ( let i = id; i < state.notes.length; i++ ) {
-				const note = state.notes[i];
-				note.id -= 1;
+		deleteNote(state, data) {
+			if ( data.partDetail ) {
+				const notes = data.partDetail.notes;
+				for ( let indexNote = 0; indexNote < notes.length; indexNote++ ) {
+					if ( notes[indexNote].idNote === data.idNote ) {
+						notes.splice(indexNote, 1);
+						break;
+					};
+				};
 			};
 		},
-		deleteCategoryInNotes(state, categorySlug) {
-			state.notes.map((note) => {
-				if ( note.categorySlug === categorySlug ) note.categorySlug = null;
-			});
+		editNote(state, { partDetail, newData }) {
+			if ( partDetail ) {
+				const editNote = partDetail.notes.find(note => note.idNote === newData.idNote);
+
+				editNote.titleNote = newData.titleNote;
+				editNote.textNote = newData.textNote;
+				editNote.category = newData.category;
+				editNote.importance = newData.importance;
+				if ( newData.fileName ) editNote.fileName = newData.fileName;
+			};
 		},
-		setDataEdit(state, data) {
+		addNotesInProject(state, { project, notes }) {
+			project.notes = notes;
+		},
+		setDataEditNote(state, data) {
 			state.dataEdit = data;
 		},
 		cleanDataEdit(state) {
 			state.dataEdit = {
 				titleNote: "",
 				textNote: "",
-				categorySlug: "",
+				categoryId: 0,
 				importance: 0
 			}
-		},
+		}
 	},
 	actions: {
-		deleteNote: function(state, id) {
-			const idNote = state.getters.getNote(id).idNote;
-
-			axios.delete(`note/delete`, {
+		deleteNote(state, data) {
+			axios.delete(`/project/${data.slugProject}/note/delete`, {
 				data: {
-					"idNote": idNote
+					"idNote": data.idNote
 				}
 			})
 			.then((res) => {
-				state.commit("deleteNote", id);
-				state.commit("updateNotes", id);
+				const partDetail = state.getters.getPartDetailById(data.idPart);
+				const partInProjectPage = state.getters.getPartDetailInProjectPage(data.idPart);
+
+				state.commit("deleteNote", {
+					partDetail,
+					idNote: data.idNote
+				});
+				state.commit("changeCountAllNotesInProject", {
+					partInProjectPage: partInProjectPage,
+					number: -1
+				})
+				state.commit("reducesCountNotesImportanceLevels", {
+					part: partInProjectPage,
+					levelImportance: data.levelImportance
+				});
 			})
 			.catch(error => {
-				console.error(error)
+				console.error(error);
 			});
 		},
-		getNotes: function(state) {
-			axios.get("/note")
+		getNotes(state, { slugProject, project }) {
+			axios.get(`/project/${slugProject}/note`)
 				.then((res) => {
-					const values = Object.values(res.data.notes);
-					for ( let i = 0; i < values.length; i++ ) {
-						values[i].id = i;
-					};
-
-					state.commit("setNotes", values);
+					const notes = res.data;
+					state.commit("addNotesInProject", { project, notes });
+					console.log(notes);
 				})
 				.catch((error) => {
-					state.dispatch("logoutUser");
-				});
+					console.error(error);
+				})
 		},
-		getNote: async function(state, id) {
+		async getNote(state, { slugProject, id }) {
+			state.commit("lockUi");
 			let resNote;
 
-			await axios.get(`note/${id}`)
+			await axios.get(`/project/${slugProject}/note/${id}`)
 			.then((res) => {
 				resNote = res.data;
 			})
@@ -103,52 +116,53 @@ export default {
 				console.error(error);
 			});
 
-			const notes = state.getters.getNotes;
-			const idNoteInArray = notes.find(note => note.idNote === resNote.idNote).id;
-
-			resNote.id = idNoteInArray;
-
+			state.commit("unlockUi");
 			return resNote;
 		},
-		createNote: function(state, data) {
+		createNote(state, data) {
 			const dataFile = new FormData();
-			dataFile.append("file", data.file);
-			delete data.file;
+			const additionalDataForm = state.getters.getAdditionalDataForm;
+			const partDetail = state.getters.getPartDetailBySlug(additionalDataForm.slugPart);
+			const currentProjectId = state.getters.getProjectCurrentId(additionalDataForm.slugProject);
+			const partInProjectPage = state.getters.getPartDetailInProjectPage(additionalDataForm.idPart);
 
-			axios.post("/note/create", dataFile, {params: {
-				titleNote: data.titleNote,
-				textNote: data.textNote,
-				categorySlug: data.categorySlug,
-				importance: data.importance
+			dataFile.append("file", data.file);
+
+			axios.post(`/project/${data.slugProject}/note/create`, dataFile, {params: {
+				...data,
+				partId: additionalDataForm.idPart,
+				projectId: currentProjectId,
 			}})
 			.then((res) => {
 				const note = res.data;
-				note["id"] = state.getters.getNotes.length;
-				
-				if ( !note.fileName ) note.fileName = null;
-
-				state.commit("addNote", note);
+				state.commit("addNote", { partDetail, note });
+				state.commit("addsCountNotesImportanceLevels", {
+					part: partInProjectPage,
+					levelImportance: data.importance
+				});
+				state.commit("changeCountAllNotesInProject", {
+					partInProjectPage: partInProjectPage,
+					number: 1
+				});
 			})
 			.catch((error) => {
 				console.error(error);
 			});
 		},
-		editNote: function(state, data) {
+		editNote(state, data) {
+			const partDetail = state.getters.getPartDetailById(data.partId);
+			const additionalDataForm = state.getters.getAdditionalDataForm;
 			const dataFile = new FormData();
 			dataFile.append("file", data.file);
 
-			axios.put("/note/edit", dataFile, {
+			axios.put(`/project/${data.slugProject}/note/edit`, dataFile, {
 				params: {
-					"idNote": data.note.idNote,
-					"titleNote": data.titleNote,
-					"textNote": data.textNote,
-					"fileName": data.note.fileName,
-					"categorySlug": data.categorySlug,
-					"importance": data.importance
+					...data,
+					...additionalDataForm
 			}})
 			.then((res) => {
-				data.fileName = res.data.fileName;
-				state.commit("editNote", data);
+				const newData = res.data;
+				state.commit("editNote", { partDetail, newData });
 			})
 			.catch((error) => {
 				console.error(error);
@@ -156,20 +170,20 @@ export default {
 		},
 	},
 	getters: {
-		getNotes(state) {
-			return state.notes;
+		getShowFormNote: state => state.isShowFormNote,
+		getActionForm: state => state.actionForm,
+		getDataEdit: state => state.dataEdit,
+		getNoteFromPart(state, getters) {
+			const parts = getters.getPartsDetail;
+			const currentIdNote = parseInt(router.currentRoute.value.params.idNote);
+
+			for ( let partIndex = 0; partIndex < parts.length; partIndex++ ) {
+				const part = parts[partIndex];
+				const note = part.notes.find(note => note.idNote === currentIdNote);
+
+				if ( note ) return note;
+			};
 		},
-		getNote: (state) => (idNote) => {
-			return state.notes[idNote];
-		},
-		getShowNoteForm(state) {
-			return state.isShowNoteForm;
-		},
-		getActionForm(state) {
-			return state.actionForm;
-		},
-		getDataEdit(state) {
-			return state.dataEdit;
-		}
+		getAdditionalDataForm: state => state.additionalDataForm,
 	},
 }

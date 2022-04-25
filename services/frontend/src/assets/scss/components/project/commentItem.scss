@@ -1,0 +1,47 @@
+.comment {
+	background-color: $color-white;
+	box-shadow: 0px 2px 8px -6px $color-black;
+	max-width: 19%;
+	margin-bottom: 12px;
+
+	&__wrapper {
+		padding: 12px;
+	}
+
+	&__text {
+		font-size: 16px;
+		line-height: 22px;
+	}
+
+	&__area {
+		margin-top: 12px;
+	}
+
+	&__btns {
+		margin-right: 8px;
+	}
+
+	&__back-btn {
+		margin-right: 8px;
+
+		&:last-child {
+			margin-right: 0;
+		}
+	}
+
+	&__btn {
+		padding: 6px 12px;
+
+		&-img {
+			width: 14px;
+			height: 14px;
+		}
+	}
+
+	&__date {
+		justify-content: flex-end;
+		opacity: 0.6;
+
+		font-weight: 500;
+	}
+}

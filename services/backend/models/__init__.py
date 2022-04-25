@@ -1,4 +1,5 @@
 from models.models import (
     Note, File, User,
-    Category, Session
+    Category, Session, Project,
+    Part, Comment
 )

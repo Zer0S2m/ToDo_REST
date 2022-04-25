@@ -13,9 +13,11 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
+
 import NavBar from "./components/NavBar";
-import NoteForm from "./components/NoteForm";
-import CategoryForm from "./components/CategoryForm";
+import NoteForm from "./components/note/NoteForm";
+import CategoryForm from "./components/category/CategoryForm";
 import Sidebar from "./components/Sidebar";
 
 
@@ -26,6 +28,14 @@ export default {
 		NoteForm,
 		CategoryForm,
 		Sidebar
+	},
+	methods: {
+		...mapActions([
+			"getProjects"
+		])
+	},
+	created() {
+		this.getProjects();
 	}
 }
 </script>

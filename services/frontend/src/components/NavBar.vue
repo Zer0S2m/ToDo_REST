@@ -4,7 +4,7 @@
 			<nav class="header__nav">
 				<ul class="header__nav-items df">
 					<li class="header__nav-item">
-						<SearchInput v-if="getInLogin" />
+						ToDo
 					</li>
 				</ul>
 			</nav>
@@ -19,14 +19,8 @@ import {
 	mapActions
 } from "vuex";
 
-import SearchInput from "./filters/SearchInput";
-
-
 export default {
 	name: "NavBar",
-	components: {
-		SearchInput
-	},
 	methods: {
 		...mapMutations([
 			"setShowModalForm",

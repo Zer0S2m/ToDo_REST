@@ -1,0 +1,66 @@
+.project-items {
+	column-gap: 16px;
+}
+
+.project-item {
+	max-width: 24%;
+	background-color: $color-white;
+	box-shadow: 0px 2px 8px -6px $color-black;
+
+	&-wrapper {
+		padding: 12px;
+	}
+
+	&-title {
+		font-size: 20px;
+		line-height: 28px;
+	}
+
+	&-link {
+		color: $color-black;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
+	&-text {
+		margin-top: 12px;
+		margin-bottom: 20px;
+	}
+
+	&-description {
+		justify-content: flex-end;
+		margin-top: auto;
+
+		&-block {
+			opacity: 0.6;
+			margin-right: 12px;
+
+			&:last-child {
+				margin-right: 0;
+			}
+
+			img {
+				width: 16px;
+				height: 16px;
+				margin-right: 4px;
+			}
+
+			&-title {
+				font-size: 400px;
+				font-size: 16px;
+				line-height: 1;
+			}
+		}
+	}
+
+	&-date {
+		font-weight: 500;
+		font-size: 16px;
+		line-height: 1;
+
+		opacity: 0.6;
+		margin-left: 16px;
+	}
+}

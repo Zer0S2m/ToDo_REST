@@ -1,9 +1,14 @@
-import ListNotes from '@/views/ListNotes'
-import NoteDetail from '@/views/NoteDetail'
-import UserSignUp from '@/views/UserSignUp'
-import UserAuth from '@/views/UserAuth'
-import ListCategories from '@/views/ListCategories'
-import CategoryDetail from '@/views/CategoryDetail'
+const NoteDetail = () => import("@/views/note/NoteDetail");
+
+const UserSignUp = () => import("@/views/UserSignUp");
+const UserAuth = () => import("@/views/UserAuth");
+
+const CategoryDetail = () => import("@/views/category/CategoryDetail");
+
+const ListProject = () => import("@/views/project/ListProject");
+const ProjectDetail = () => import("@/views/project/ProjectDetail");
+const PageProject = () => import("@/views/project/PageProject");
+const PartDetail = () => import("@/views/project/PartDetail");
 
 import store from "@/store"
 import {
@@ -17,41 +22,53 @@ const routes = [
 		path: '/',
 		redirect: to => {
 			return {
-				name: "ListNotes"
+				name: "ListProject"
 			};
 		}
 	},
 	{
-		path: "/note/",
-		name: 'ListNotes',
-		component: ListNotes,
-		meta: { 
+		path: "/project",
+		component: PageProject,
+		meta: {
 			requiresAuth: true
-		}
-	},
-	{
-		path: '/note/:id',
-		name: 'NoteDetail',
-		component: NoteDetail,
-		meta: { 
-			requiresAuth: true
-		}
-	},
-	{
-		path: "/category",
-		name: "ListCategories",
-		component: ListCategories,
-		meta: { 
-			requiresAuth: true
-		}
-	},
-	{
-		path: "/category/:slug",
-		name: "CategoryDetail",
-		component: CategoryDetail,
-		meta: { 
-			requiresAuth: true
-		}
+		},
+		children: [
+			{
+				path: "",
+				name: "ListProject",
+				component: ListProject
+			},
+			{
+				path: ":slugProject",
+				name: "ProjectDetail",
+				component: ProjectDetail,
+				props: true
+			},
+			{
+				path: ":slugProject/part/:slugPart",
+				name: "PartDetail",
+				component: PartDetail,
+				props: true
+			},
+			{
+				path: ':slugProject/note/:idNote',
+				name: 'NoteDetail',
+				component: NoteDetail,
+				props: true,
+				meta: {
+					requiresAuth: true
+				}
+			},
+			{
+				path: ":slugProject/category/:slugCategory",
+				name: "CategoryDetail",
+				component: CategoryDetail,
+				props: true,
+				meta: {
+					requiresAuth: true
+				}
+			},
+		]
 	},
 	{
 		path: "/user/auth",

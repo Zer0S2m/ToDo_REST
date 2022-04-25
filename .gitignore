@@ -9,6 +9,5 @@ __pycache__
 *.njsproj
 *.sln
 db_todo.db
-db
 media
 vetur.config.js

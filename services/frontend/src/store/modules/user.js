@@ -8,15 +8,15 @@ export default {
 		token: localStorage.getItem('token') || "",
 	},
 	mutations: {
-		setToken: function(state, token) {
+		setToken(state, token) {
 			state.token = token;
 		},
-		clearUser: function(state) {
+		clearUser(state) {
 			state.token = "";
 		}
 	},
 	actions: {
-		loginUser: async function(state, data) {
+		async loginUser(state, data) {
 			let errorPost;
 			const { username, password } = data;
 			const formData = new FormData();
@@ -24,18 +24,17 @@ export default {
 			formData.append("password", password);
 
 			await axios.post("/user/auth", formData)
-				.then((res) => { 
+				.then((res) => {
 					const data = res.data;
 					localStorage.setItem('token', data.access_token);
 
 					axios.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`;
 
 					state.commit("setToken", data.access_token);
-					state.dispatch("getNotes");
-					state.dispatch("getCategories");
+					state.dispatch("getProjects");
 
 					router.push({
-						name: "ListNotes"
+						name: "ListProject"
 					});
 				})
 				.catch((error) => {
@@ -44,7 +43,7 @@ export default {
 
 			return errorPost;
 		},
-		signUpUser: async function(state, data) {
+		async signUpUser(state, data) {
 			const { username, password, email } = data;
 			let errorObj;
 
@@ -64,10 +63,9 @@ export default {
 
 			return errorObj;
 		},
-		logoutUser: function(state) {
+		logoutUser(state) {
 			state.commit('clearUser');
-			state.commit("setNotes", []);
-			state.commit("setCategories", []);
+			state.commit("setProjects", []);
 			localStorage.removeItem('token');
 			delete axios.defaults.headers.common['Authorization'];
 
@@ -77,11 +75,7 @@ export default {
 		},
 	},
 	getters: {
-		getToken(state) {
-			return state.token;
-		},
-		getInLogin(state) {
-			return !!state.token;
-		}
+		getToken: state => state.token,
+		getInLogin: state => !!state.token,
 	}
 }

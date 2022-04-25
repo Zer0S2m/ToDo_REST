@@ -1,0 +1,26 @@
+.back__loader {
+	min-height: calc(100vh - 60px);
+}
+
+.loader {
+	display: inline-block;
+	width: 56px;
+	height: 56px;
+	color: inherit;
+	vertical-align: middle;
+	pointer-events: none;
+	border: 6px solid $primary-color-2;
+	border-bottom-color: transparent;
+	border-radius: 50%;
+	animation: 1.2s loader-03 linear infinite;
+	position: relative;
+}
+
+@keyframes loader-03 {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}

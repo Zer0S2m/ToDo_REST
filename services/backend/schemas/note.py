@@ -1,42 +1,46 @@
-from typing import (
-    Optional, Union, List
-)
+from typing import Optional
 
 from datetime import datetime
 
-from pydantic import BaseModel
-from pydantic import Field
+from pydantic import (
+	BaseModel, Field
+)
 
 from config import (
-    LIMIT_NOTE_TEXT, LIMIT_NOTE_TITLE
+	LIMIT_NOTE_TEXT, LIMIT_NOTE_TITLE
 )
+
+from .category import CategorySchemeInNote
 
 
 class BaseNote(BaseModel):
-    title: Optional[str] = Field(None, alias = "titleNote", max_length = LIMIT_NOTE_TITLE)
-    text: Optional[str] = Field(alias = "textNote", max_length = LIMIT_NOTE_TEXT)
-    pub_date: Optional[datetime] = Field(alias = "pubDate", default = datetime.now())
-    category_slug: Optional[str] = Field(None, alias = "categorySlug")
-    importance: Optional[int] = Field(None)
+	title: Optional[str] = Field(None, alias = "titleNote", max_length = LIMIT_NOTE_TITLE)
+	text: str = Field(alias = "textNote", max_length = LIMIT_NOTE_TEXT)
+	pub_date: datetime = Field(alias = "pubDate", default = datetime.now())
+	importance: Optional[int] = Field(None)
+	part_id: int = Field(alias = "partId")
+	project_id: int = Field(alias = "projectId")
+
+	class Config:
+		allow_population_by_field_name = True
+		orm_mode = True
 
 
 class NoteSchema(BaseNote):
-    id: Optional[int] = Field(None, alias = "idNote")
-    file_name: Union[bool, str] = Field(None, alias = "fileName")
+	id: int = Field(alias = "idNote")
+	file_name: Optional[str] = Field(None, alias = "fileName")
+	category: Optional[CategorySchemeInNote] = Field(None)
 
 
 class NoteCreate(BaseNote):
-    ...
-
-
-class NoteList(BaseModel):
-    notes: List[NoteSchema]
+	category_id: Optional[int] = Field(None, alias = "categoryId")
 
 
 class NoteDeleted(BaseModel):
-    id: Optional[int] = Field(alias = "idNote")
+	id: int = Field(alias = "idNote")
 
 
 class NoteEdit(BaseNote):
-    id: Optional[int] = Field(alias = "idNote")
-    file_name: Union[bool, str] = Field(None, alias = "fileName")
+	id: int = Field(alias = "idNote")
+	file_name: Optional[str] = Field(None, alias = "fileName")
+	category_id: Optional[int] = Field(None, alias = "categoryId")

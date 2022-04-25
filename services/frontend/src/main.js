@@ -14,8 +14,14 @@ axios.defaults.baseURL = 'http://localhost:5000/';
 const token = localStorage.getItem("token");
 if ( token ) {
 	axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-	store.dispatch("getNotes");
-	store.dispatch("getCategories");
+	axios.interceptors.response.use(undefined, (err) => {
+		return new Promise(function (resolve, reject) {
+			if (err.response.status === 401) {
+				store.dispatch("logoutUser");
+			};
+			throw err;
+		});
+	});
 };
 
 const app = createApp(App);

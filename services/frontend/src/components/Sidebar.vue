@@ -11,7 +11,7 @@
 							<router-link
 								active-class="sidebar__item-link--active"
 								:to="{ name: 'UserAuth' }"
-								class="sidebar__item-link df w100"
+								class="sidebar__item-link df al-it-center w100"
 							>
 								<span>Auth</span>
 						</router-link>
@@ -20,7 +20,7 @@
 							<router-link
 								active-class="sidebar__item-link--active"
 								:to="{ name: 'UserSignUp' }"
-								class="sidebar__item-link df w100"
+								class="sidebar__item-link df al-it-center w100"
 							>
 								<span>Sign up</span>
 							</router-link>
@@ -28,49 +28,25 @@
 						<li class="sidebar__item df" v-if="getInLogin">
 							<router-link
 								active-class="sidebar__item-link--active"
-								:to="{ name: 'ListNotes' }"
-								class="sidebar__item-link df w100"
+								:to="{ name: 'ListProject' }"
+								class="sidebar__item-link df al-it-center w100"
 							>
-								<span class="sidebar__item-link-img">
-									<img src="@/assets/img/notes.svg" alt="">
+								<span class="sidebar__item-link-img df al-it-center">
+									<img src="@/assets/img/project.svg" alt="">
 								</span>
-								<span>Notes</span>
-							</router-link>
-						</li>
-						<li class="sidebar__item df" v-if="getInLogin">
-							<router-link
-								active-class="sidebar__item-link--active"
-								:to="{ name: 'ListCategories' }"
-								class="sidebar__item-link df w100"
-							>
-								<span class="sidebar__item-link-img">
-									<img src="@/assets/img/category.svg" alt="">
-								</span>
-								<span>Categories</span>
+								<span>Projects</span>
 							</router-link>
 						</li>
 						<li class="sidebar__item df" v-if="getInLogin">
 							<button
 								type="button"
-								class="sidebar__item-link df w100"
-								@click="openFormNote"
+								class="sidebar__item-link df al-it-center w100"
+								@click="setShowFormProject(true)"
 							>
-								<span class="sidebar__item-link-img">
-									<img src="@/assets/img/add-note.svg" alt="">
+								<span class="sidebar__item-link-img df al-it-center">
+									<img src="@/assets/img/add.svg" alt="">
 								</span>
-								<span>Add note</span>
-							</button>
-						</li>
-						<li class="sidebar__item df" v-if="getInLogin">
-							<button
-								type="button"
-								class="sidebar__item-link df w100"
-								@click="setShowFormCategory(true)"
-							>
-								<span class="sidebar__item-link-img">
-									<img src="@/assets/img/add-category.svg" alt="">
-								</span>
-								<span>Add category</span>
+								<span>Add project</span>
 							</button>
 						</li>
 					</ul>
@@ -91,14 +67,8 @@ export default {
 	name: "Sidebar",
 	methods: {
 		...mapMutations([
-			"setShowNoteForm",
-			"setShowFormCategory",
-			"setActionForFormNote"
+			"setShowFormProject"
 		]),
-		openFormNote() {
-			this.setShowNoteForm(true);
-			this.setActionForFormNote("create");
-		},
 	},
 	computed: {
 		...mapGetters([

@@ -1,0 +1,44 @@
+.category-page {
+
+	&__title {
+		font-size: 24px;
+    line-height: 32px;
+	}
+
+	&__wrapper {
+		margin-top: 20px;
+	}
+
+	&__part {
+		margin-bottom: 20px;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+
+		&-title {
+			font-size: 20px;
+			line-height: 28px;
+			font-weight: 500;
+		}
+
+		&-link {
+			color: $color-black;
+
+			&:hover {
+				text-decoration: underline;
+			}
+		}
+
+		&-notes {
+			margin-top: 12px;
+
+			column-gap: 12px;
+			flex-wrap: wrap;
+
+			.note {
+				max-width: 24%;
+			}
+		}
+	}
+}

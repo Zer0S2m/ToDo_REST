@@ -1,28 +1,38 @@
-from typing import List
-
+from typing import Optional
 from pydantic import BaseModel
 from pydantic import Field
 
 from config import (
-    LIMIT_CATEGORY_TITLE, LIMIT_CATEGORY_SLUG
+	LIMIT_CATEGORY_TITLE, LIMIT_CATEGORY_SLUG
 )
 
 
 class CategoryBase(BaseModel):
-    slug: str = Field(max_length = LIMIT_CATEGORY_SLUG)
+	slug: str = Field(max_length = LIMIT_CATEGORY_SLUG)
+	project_id: int = Field(alias = "projectId")
+
+	class Config:
+		allow_population_by_field_name = True
+		orm_mode = True
 
 
-class CategorySchema(CategoryBase):
-    title: str = Field(max_length = LIMIT_CATEGORY_TITLE)
+class CategorySchemaCreate_Main(CategoryBase):
+	title: str = Field(max_length = LIMIT_CATEGORY_TITLE)
 
 
-class CategoryCreate(CategorySchema):
-    ...
+class CategorySchema(CategorySchemaCreate_Main):
+	id: int
 
 
-class CategoryDelete(CategoryBase):
-    ...
+class CategoryCreate(CategorySchemaCreate_Main):
+	...
 
 
-class CategoryList(BaseModel):
-    categories: List[CategorySchema]
+class CategoryDelete(BaseModel):
+	slug: str = Field(max_length = LIMIT_CATEGORY_SLUG)
+
+
+class CategorySchemeInNote(BaseModel):
+	id: Optional[int]
+	slug: Optional[str] = Field(None, max_length = LIMIT_CATEGORY_SLUG)
+	title: Optional[str] = Field(None, max_length = LIMIT_CATEGORY_TITLE)

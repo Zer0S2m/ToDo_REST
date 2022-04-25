@@ -1,16 +1,26 @@
 import os
 import time
-from typing import Union
+from typing import (
+	Dict, List, Optional
+)
 
 import aiofiles
 
-from fastapi import UploadFile
+from fastapi import (
+	Depends, UploadFile, HTTPException,
+	Request
+)
 
 from config import MEDIA_DIR
 
-from models import Note
+from schemas.user import UserInDB
 
-from schemas.note import NoteSchema
+from utils.users import get_current_user
+from utils.db.project import get_project_db_for_check
+
+from models import (
+	Note, Project
+)
 
 
 def check_path_media_dir():
@@ -48,25 +58,58 @@ async def writing_file(
 		await f.write(contents)
 
 
-def create_slug_category(
-	slug: str,
-	user_id: int
-) -> str:
-	slug_split = slug.strip().split(" ")
-	return f"{'_'.join(slug_split)}_{user_id}"
-
-
-def create_note_schema(
+def set_category_note(
 	note: Note,
-	file_name: str,
-	category_slug: Union[str, None] = None
-) -> NoteSchema:
-	return NoteSchema(
-        titleNote = note.title,
-        textNote = note.text,
-        idNote = note.id,
-        pubDate = note.pub_date,
-        fileName = file_name,
-		categorySlug = category_slug,
-		importance = note.importance
-    )
+	note_dict: Optional[dict] = None,
+) -> dict:
+	if not note_dict:
+		note_dict = note.as_dict
+
+	note_dict["category"] = {
+		"id": None,
+		"slug": None,
+		"title": None
+	}
+	note_dict["category"]["slug"] = note.category.slug if note.category else None
+	note_dict["category"]["title"] = note.category.title if note.category else None
+	note_dict["category"]["id"] = note.category.id if note.category else None
+
+	return note_dict
+
+
+def set_file_name_note(
+	note: Note,
+	note_dict: dict = None,
+) -> dict:
+	if not note_dict:
+		note_dict = note.as_dict
+
+	note_dict["file_name"] = note.file.file_name if note.file else None
+
+	return note_dict
+
+
+def set_count_notes_importance_levels(
+	notes: List[Note]
+) -> Dict[int, int]:
+	count_levels = {
+		0: 0,
+		1: 0,
+		2: 0,
+		3: 0,
+	}
+
+	for note in notes:
+		count_levels[note.importance] += 1
+
+	return count_levels
+
+
+async def check_is_project_in_db(
+	request: Request,
+	current_user: UserInDB = Depends(get_current_user)
+) -> Project:
+	project = await get_project_db_for_check(request.path_params["slug_project"], current_user)
+	if not project:
+		raise HTTPException(status_code = 404, detail = "Project not found")
+	return project
