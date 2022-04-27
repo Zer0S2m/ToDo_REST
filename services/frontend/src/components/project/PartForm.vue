@@ -112,23 +112,43 @@ export default {
 	},
 	methods: {
 		...mapActions([
-			"createPart"
+			"createPart",
+			"editPart"
 		]),
 		...mapMutations([
-			"setShowFormPart"
+			"setShowFormPart",
+			"setActionFormPart",
+			"setEditDataPart"
 		]),
 		submit() {
+			const actionFormPart = this.getActionFormPart;
 
-			this.createPart({
-				title: this.title,
-				slug: this.slug,
-				description: this.description,
-				slugProject: this.$route.params.slugProject
-			});
+			if ( actionFormPart === "create" ) {
+				this.createPart({
+					title: this.title,
+					slug: this.slug,
+					description: this.description,
+					slugProject: this.$route.params.slugProject
+				});
+			} else if ( actionFormPart === "edit" ) {
+				const dataEdit = this.getEditDataPart;
+
+				this.editPart({
+					data: {
+						title: this.title,
+						description: this.description,
+						id: dataEdit.id
+					},
+					slugProject: this.$route.params.slugProject,
+				});
+			};
+
 			this.closeForm();
 		},
 		closeForm() {
 			this.setShowFormPart(false);
+			this.setActionFormPart("");
+			this.setEditDataPart({});
 			this.title = "";
 			this.slug = "";
 			this.description = "";
@@ -136,8 +156,21 @@ export default {
 	},
 	computed: {
 		...mapGetters([
-			"getIsShowFormPart"
+			"getIsShowFormPart",
+			"getEditDataPart",
+			"getActionFormPart"
 		])
+	},
+	watch: {
+		getIsShowFormPart(isShow) {
+			if ( isShow && this.getActionFormPart === "edit" ) {
+				const dataEdit = this.getEditDataPart;
+
+				this.title = dataEdit.title;
+				this.description = dataEdit.description;
+				this.slug = dataEdit.slug;
+			}
+		}
 	}
 }
 </script>

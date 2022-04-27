@@ -1,9 +1,11 @@
 from datetime import datetime
-from typing import List
-from typing import Optional
+from typing import (
+	List, Optional
+)
 
-from pydantic import BaseModel
-from pydantic import Field
+from pydantic import (
+	BaseModel, Field
+)
 
 from .comment import CommentSchema
 from .part import (
@@ -17,10 +19,13 @@ from config import (
 )
 
 
-class ProjectBase(BaseModel):
+class ProjectDataStr(BaseModel):
 	title: str = Field(max_length = LIMIT_TITLE_PROJECT)
-	slug: str = Field(max_length = LIMIT_SLUG_PROJECT)
 	description: Optional[str] = Field(None, max_length = LIMIT_DESCRIPTION_PROJECT)
+
+
+class ProjectBase(ProjectDataStr):
+	slug: str = Field(max_length = LIMIT_SLUG_PROJECT)
 	pub_date: Optional[datetime] = Field(None, alias = "pubDate")
 
 	class Config:
@@ -48,3 +53,11 @@ class ProjectCreate(ProjectBase):
 
 class ProjectDeleted(BaseModel):
 	slug: str = Field(max_length = LIMIT_SLUG_PROJECT)
+
+
+class ProjectEdit(ProjectDataStr):
+	id: int
+
+	class Config:
+		allow_population_by_field_name = True
+		orm_mode = True

@@ -14,10 +14,13 @@ from config import (
 )
 
 
-class PartBase(BaseModel):
+class PartDataStr(BaseModel):
 	title: str = Field(max_length = LIMIT_TITLE_PART)
-	slug: str = Field(max_length = LIMIT_SLUG_PART)
 	description: Optional[str] = Field(None, max_length = LIMIT_DESCRIPTION_PART)
+
+
+class PartBase(PartDataStr):
+	slug: str = Field(max_length = LIMIT_SLUG_PART)
 	pub_date: Optional[datetime] = Field(None, alias = "pubDate")
 
 	class Config:
@@ -48,3 +51,11 @@ class PartInProject(BaseModel):
 	id: int
 	title: str = Field(max_length = LIMIT_TITLE_PART)
 	slug: str = Field(max_length = LIMIT_SLUG_PART)
+
+
+class PartEdit(PartDataStr):
+	id: int
+
+	class Config:
+		allow_population_by_field_name = True
+		orm_mode = True

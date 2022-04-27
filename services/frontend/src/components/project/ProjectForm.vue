@@ -112,21 +112,39 @@ export default {
 	},
 	methods: {
 		...mapActions([
-			"createProject"
+			"createProject",
+			"editProject"
 		]),
 		...mapMutations([
-			"setShowFormProject"
+			"setShowFormProject",
+			"setActionFormProject",
+			"setEditDataProject"
 		]),
 		submit() {
-			this.createProject({
-				title: this.title,
-				slug: this.slug,
-				description: this.description,
-			});
+			const actionForm = this.getActionFormProject;
+
+			if ( actionForm === "create" ) {
+				this.createProject({
+					title: this.title,
+					slug: this.slug,
+					description: this.description,
+				});
+			} else if ( actionForm === "edit" ) {
+				const dataEdit = this.getEditDataProject;
+
+				this.editProject({
+					title: this.title,
+					description: this.description,
+					id: dataEdit.id
+				});
+			};
+
 			this.closeForm();
 		},
 		closeForm() {
+			this.setEditDataProject({});
 			this.setShowFormProject(false);
+			this.setActionFormProject("");
 			this.title = "";
 			this.slug = "";
 			this.description = "";
@@ -134,8 +152,21 @@ export default {
 	},
 	computed: {
 		...mapGetters([
-			"getIsShowFormProject"
+			"getIsShowFormProject",
+			"getActionFormProject",
+			"getEditDataProject"
 		])
+	},
+	watch: {
+		getIsShowFormProject(isShow) {
+			if ( this.getActionFormProject === "edit" && isShow ) {
+				const dataEdit = this.getEditDataProject;
+
+				this.title = dataEdit.title;
+				this.slug = dataEdit.slug;
+				this.description = dataEdit.description;
+			}
+		}
 	}
 }
 </script>

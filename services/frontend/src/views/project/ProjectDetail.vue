@@ -11,7 +11,7 @@
 					:slugProject="slugProject"
 				>
 				</PartItem>
-				<button type="button" @click="setShowFormPart(true)" class="project__add project__add-part df w100 al-it-center column just-center">
+				<button type="button" @click="addPart" class="project__add project__add-part df w100 al-it-center column just-center">
 					<img src="@/assets/img/add-white.svg" alt="" class="project__add-img project__add-part-img">
 					<span class="project__add-text project__add-part-text">Add part</span>
 				</button>
@@ -87,7 +87,8 @@ export default {
 			"setIsShowFormComment",
 			"setActionFormComment",
 			"setShowFormPart",
-			"setShowFormCategory"
+			"setShowFormCategory",
+			"setActionFormPart"
 		]),
 		...mapActions([
 			"getDetailProject"
@@ -100,6 +101,10 @@ export default {
 				idProject: this.project.id
 			});
 		},
+		addPart() {
+			this.setActionFormPart("create");
+			this.setShowFormPart(true);
+		}
 	},
 	computed: {
 		...mapGetters([

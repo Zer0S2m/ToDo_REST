@@ -1,25 +1,35 @@
 <template>
 	<div class="part-item w100">
 		<div
-			class="part-item__menu"
-			:class="{ 'part-item__menu--active': isShowMenu }"
+			class="card-menu"
+			:class="{ 'card-menu--active': isShowMenu }"
 		>
-			<div class="part-item__menu-wrapper">
-				<ul class="part-item__menu-items">
-					<li class="part-item__menu-item">
+			<div class="card-menu-wrapper">
+				<ul class="card-menu-items">
+					<li class="card-menu-item">
 						<button
 							type="button"
-							class="part-item__menu-item-btn df al-it-center"
+							class="card-menu-item-btn df al-it-center"
 							@click="openFormNote"
 						>
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#318ae5" viewBox="0 0 24 24"><path d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 13h-5v5h-2v-5h-5v-2h5v-5h2v5h5v2z"/></svg>
 							<span>Add note</span>
 						</button>
 					</li>
-					<li class="part-item__menu-item">
+					<li class="card-menu-item">
 						<button
 							type="button"
-							class="part-item__menu-item-btn df al-it-center"
+							class="card-menu-item-btn df al-it-center"
+							@click="toEditPart"
+						>
+							<img src="@/assets/img/edit-blue.svg" alt="">
+							<span>Part editing</span>
+						</button>
+					</li>
+					<li class="card-menu-item">
+						<button
+							type="button"
+							class="card-menu-item-btn df al-it-center"
 							@click="toDeletedPart"
 						>
 							<img src="@/assets/img/delete.svg" alt="">
@@ -50,7 +60,7 @@
 					class="part-item__btn-menu df"
 					@click="openMenu()"
 				>
-					<img src="@/assets/img/menu-part.svg" alt="" class="part-item__btn-menu-img">
+					<img src="@/assets/img/menu.svg" alt="" class="part-item__btn-menu-img">
 				</button>
 			</div>
 			<div class="part-item__text">
@@ -113,7 +123,10 @@ export default {
 		...mapMutations([
 			"setShowFormNote",
 			"setActionForFormNote",
-			"setAdditionalDataForm"
+			"setAdditionalDataForm",
+			"setEditDataPart",
+			"setShowFormPart",
+			"setActionFormPart"
 		]),
 		...mapActions([
 			"deletePart"
@@ -139,6 +152,17 @@ export default {
 				slugPart: this.part.slug,
 			});
 			this.setShowFormNote(true);
+		},
+		toEditPart() {
+			this.setEditDataPart({
+				description: this.part.description,
+				title: this.part.title,
+				slug: this.part.slug,
+				id: this.part.id
+			});
+			this.isShowMenu = false;
+			this.setShowFormPart(true);
+			this.setActionFormPart("edit");
 		}
 	},
 	computed: {

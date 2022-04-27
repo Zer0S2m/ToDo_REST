@@ -7,11 +7,11 @@ from fastapi import (
 from schemas.user import UserInDB
 from schemas.project.project import (
 	ProjectCreate, ProjectDeleted, ProjectSchema,
-	ProjectMain
+	ProjectMain, ProjectEdit
 )
 from schemas.project.part import (
 	PartSchema, PartCreate, PartList,
-	PartDeleted
+	PartDeleted, PartEdit
 )
 from schemas.project.comment import (
 	CommentCreate, CommentSchema, CommentDeleted,
@@ -24,7 +24,7 @@ from utils.db.project import (
 	delete_project_db, create_part_db, get_parts_db,
 	get_part_db, delete_part_db, get_comments_db,
 	delete_comment_db, create_comment_db, edit_comment_db,
-	get_project_db_for_check
+	get_project_db_for_check, edit_part_db, edit_project_db
 )
 from utils.common import (
 	set_category_note, set_file_name_note, set_count_notes_importance_levels,
@@ -34,7 +34,9 @@ from utils.slug import (
 	create_slug_project
 )
 
-from models import Part
+from models import (
+	Part, Project
+)
 
 
 router = APIRouter(
@@ -103,6 +105,18 @@ async def delete_project(
 	await delete_project_db(project, current_user)
 
 
+@router.put(
+	"/edit",
+	response_model = ProjectEdit
+)
+async def edit_project(
+	part: ProjectEdit,
+	current_user: UserInDB = Depends(get_current_user),
+) -> Project:
+	project_db = await edit_project_db(part, current_user)
+	return project_db
+
+
 @router.get(
 	"/{slug_project:str}",
 	response_model = ProjectSchema
@@ -132,41 +146,6 @@ async def get_project(
 	})
 
 	return project
-
-
-@router.post(
-	"/{slug_project:str}/part/create",
-	response_model = PartList,
-	tags = ["part"],
-	dependencies = [Depends(check_is_project_in_db)]
-)
-async def create_part(
-	part: PartCreate,
-	slug_project: str,
-	current_user: UserInDB = Depends(get_current_user)
-):
-	new_part = await create_part_db(part, current_user)
-	part = new_part.as_dict
-	part.update({
-		"notes": [],
-		"count_notes": len([]),
-		"count_notes_importance_levels": set_count_notes_importance_levels([])
-	})
-
-	return part
-
-
-@router.delete(
-	"/{slug_project:str}/part/delete",
-	tags = ["part"],
-	dependencies = [Depends(check_is_project_in_db)]
-)
-async def delete_part(
-	part: PartDeleted,
-	slug_project: str,
-	current_user: UserInDB = Depends(get_current_user)
-):
-	await delete_part_db(part, current_user)
 
 
 @router.get(
@@ -215,6 +194,56 @@ async def get_part(
 	part.update({"notes": notes})
 
 	return part
+
+
+@router.post(
+	"/{slug_project:str}/part/create",
+	response_model = PartList,
+	tags = ["part"],
+	dependencies = [Depends(check_is_project_in_db)]
+)
+async def create_part(
+	part: PartCreate,
+	slug_project: str,
+	current_user: UserInDB = Depends(get_current_user)
+):
+	new_part = await create_part_db(part, current_user)
+	part = new_part.as_dict
+	part.update({
+		"notes": [],
+		"count_notes": len([]),
+		"count_notes_importance_levels": set_count_notes_importance_levels([])
+	})
+
+	return part
+
+
+@router.delete(
+	"/{slug_project:str}/part/delete",
+	tags = ["part"],
+	dependencies = [Depends(check_is_project_in_db)]
+)
+async def delete_part(
+	part: PartDeleted,
+	slug_project: str,
+	current_user: UserInDB = Depends(get_current_user)
+):
+	await delete_part_db(part, current_user)
+
+
+@router.put(
+	"/{slug_project:str}/part/edit",
+	tags = ["part"],
+	response_model = PartEdit,
+	dependencies = [Depends(check_is_project_in_db)],
+)
+async def edit_part(
+	slug_project: str,
+	part: PartEdit,
+	current_user: UserInDB = Depends(get_current_user),
+) -> Part:
+	part_db = await edit_part_db(part, current_user)
+	return part_db
 
 
 @router.get(
