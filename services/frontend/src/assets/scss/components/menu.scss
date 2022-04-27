@@ -1,0 +1,41 @@
+.card-menu {
+	position: absolute;
+	top: 12px;
+	right: 40px;
+	z-index: 10;
+	box-shadow: 0px 4px 12px rgba($color-black, 25%);
+	background-color: $color-white;
+	border-radius: 4px;
+
+	opacity: 0;
+	visibility: hidden;
+
+	&.card-menu--active {
+		visibility: visible;
+		opacity: 1;
+	}
+
+	&-wrapper {
+		padding: 12px 20px;
+	}
+
+	&-item {
+		margin-bottom: 12px;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+
+		&-btn {
+			font-size: 16px;
+			line-height: 1;
+
+			img,
+			svg {
+				width: 16px;
+				height: 16px;
+				margin-right: 6px;
+			}
+		}
+	}
+}

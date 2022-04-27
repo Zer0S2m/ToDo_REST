@@ -41,7 +41,7 @@
 							<button
 								type="button"
 								class="sidebar__item-link df al-it-center w100"
-								@click="setShowFormProject(true)"
+								@click="openFormProject"
 							>
 								<span class="sidebar__item-link-img df al-it-center">
 									<img src="@/assets/img/add.svg" alt="">
@@ -67,8 +67,13 @@ export default {
 	name: "Sidebar",
 	methods: {
 		...mapMutations([
-			"setShowFormProject"
+			"setShowFormProject",
+			"setActionFormProject"
 		]),
+		openFormProject() {
+			this.setActionFormProject("create");
+			this.setShowFormProject(true);
+		}
 	},
 	computed: {
 		...mapGetters([

@@ -7,13 +7,17 @@ export default {
 	state: {
 		projects: [],
 		projectsDetail: [],
+		editDataProject: {},
+		actionFormProject: "",
 		partsDetail: [],
 		isShowFormComment: false,
 		isShowFormProject: false,
 		isShowFormPart: false,
 		actionFormComment: "",
 		editDataComment: {},
-		dataForCreateComment: {}
+		dataForCreateComment: {},
+		editDataPart: {},
+		actionFormPart: ""
 	},
 	mutations: {
 		// Project
@@ -44,6 +48,29 @@ export default {
 				const part = currentProject.parts.find(part => part.id === data.idPart);
 				part.countNotesImportanceLevels[data.lastImportance]--;
 				part.countNotesImportanceLevels[data.newImportance]++;
+			};
+		},
+		setEditDataProject(state, data) {
+			state.editDataProject = data;
+		},
+		setActionFormProject(state, action) {
+			state.actionFormProject = action;
+		},
+		deleteProject(state, slugProject) {
+			const indexProjectItem = state.projects.findIndex(project => project.slug === slugProject);
+			const indexProjectDetail = state.projectsDetail.findIndex(project => project.slug === slugProject);
+
+			state.projects.splice(indexProjectItem, 1);
+			if ( indexProjectDetail ) state.projectsDetail.splice(indexProjectDetail, 1);
+		},
+		editProject(state, data) {
+			let projectItem = state.projects.find(project => project.id === data.id);
+			let projectDetail = state.projectsDetail.find(project => project.id === data.id);
+
+			projectItem = Object.assign(projectItem, data);
+
+			if ( projectDetail ) {
+				projectDetail = Object.assign(projectDetail, data);
 			};
 		},
 		// Comment
@@ -82,6 +109,22 @@ export default {
 				slug: newPart.slug,
 				id: newPart.id
 			});
+		},
+		setEditDataPart(state, data) {
+			state.editDataPart = data;
+		},
+		setActionFormPart(state, action) {
+			state.actionFormPart = action;
+		},
+		editPart(state, { data, listProjects, partDetail }) {
+			let partBase = listProjects.projectBase.parts.find(part => part.id === data.id);
+			let partDetailInPageProject = listProjects.projectDetail.parts.find(part => part.id === data.id);
+			partBase = Object.assign(partBase, data);
+			partDetailInPageProject = Object.assign(partDetailInPageProject, data);
+
+			if ( partDetail ) {
+				partDetail = Object.assign(partDetail, data);
+			};
 		},
 		setShowFormPart(state, value) {
 			state.isShowFormPart = value;
@@ -148,6 +191,30 @@ export default {
 			state.commit("unlockUi");
 			return projectDetail;
 		},
+		deleteProject(state, slugProject) {
+			axios.delete("/project/delete", {
+				data: {
+					slug: slugProject
+				}
+			})
+				.then((res) => {
+					state.commit("deleteProject", slugProject);
+				})
+				.catch((error) => {
+					console.error(error);
+				});
+		},
+		editProject(state, data) {
+			axios.put("/project/edit", {
+				...data
+			})
+				.then((res) => {
+					state.commit("editProject", data);
+				})
+				.catch((error) => {
+					console.error(error);
+				})
+		},
 		// Comment
 		deleteProjectComment(state, { idUrl, slugProject, idIndex }) {
 			const listProjects = state.getters.getProjectDetailAndBase(slugProject);
@@ -186,6 +253,19 @@ export default {
 				.then((res) => {
 					const newPart = res.data;
 					state.commit("createPart", { newPart, listProjects });
+				})
+				.catch((error) => {
+					console.error(error);
+				});
+		},
+		editPart(state, { data, slugProject }) {
+			axios.put(`/project/${slugProject}/part/edit`, {
+				...data
+			})
+				.then((res) => {
+					const listProjects = state.getters.getProjectDetailAndBase(slugProject);
+					const partDetail = state.getters.getPartDetailById(data.id);
+					state.commit("editPart", { data, listProjects, partDetail })
 				})
 				.catch((error) => {
 					console.error(error);
@@ -246,6 +326,8 @@ export default {
 				projectBase: state.projects.find(project => project.slug === slugProject)
 			}
 		},
+		getEditDataProject: state => state.editDataProject,
+		getActionFormProject: state => state.actionFormProject,
 		// Comment
 		getIsShowFormComment: state => state.isShowFormComment,
 		getEditDataComment: state => state.editDataComment,
@@ -265,5 +347,7 @@ export default {
 			};
 		},
 		getIsShowFormPart: state => state.isShowFormPart,
+		getEditDataPart: state => state.editDataPart,
+		getActionFormPart: state => state.actionFormPart
 	}
 }
