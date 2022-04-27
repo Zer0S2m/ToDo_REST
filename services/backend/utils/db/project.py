@@ -3,21 +3,21 @@ from typing import List
 from datetime import datetime
 
 from sqlalchemy import (
-	select, and_, or_
+	select, and_
 )
 from sqlalchemy.orm import selectinload
 
 from models import (
-	Note, Session, Project,
-	Part, Comment
+	Session, Project, Comment,
+	Part
 )
 
 from schemas.user import UserInDB
 from schemas.project.project import (
-	ProjectCreate, ProjectDeleted
+	ProjectCreate, ProjectDeleted, ProjectEdit
 )
 from schemas.project.part import (
-	PartCreate, PartDeleted
+	PartCreate, PartDeleted, PartEdit
 )
 from schemas.project.comment import (
 	CommentCreate, CommentDeleted, CommentEdit
@@ -114,6 +114,26 @@ async def delete_project_db(
 		await session.commit()
 
 
+async def edit_project_db(
+	edit_project: ProjectEdit,
+	current_user: UserInDB
+) -> Project:
+	async with Session.begin() as session:
+		project = await session.execute(
+			select(Project)
+			.filter_by(user_id = current_user.user_id)
+			.where(Project.id == edit_project.id)
+		)
+		project = project.scalars().first()
+
+		for key, value in edit_project.dict(exclude = {"id"}).items():
+			setattr(project, key, value)
+
+		await session.commit()
+
+	return project
+
+
 async def get_parts_db(
 	slug_category: str,
 	current_user: UserInDB,
@@ -185,6 +205,26 @@ async def delete_part_db(
 		deleted_part = deleted_part.scalars().first()
 		await session.delete(deleted_part)
 		await session.commit()
+
+
+async def edit_part_db(
+	edit_part: PartEdit,
+	current_user: UserInDB
+) -> Part:
+	async with Session.begin() as session:
+		part = await session.execute(
+			select(Part)
+			.filter_by(user_id = current_user.user_id)
+			.where(Part.id == edit_part.id)
+		)
+		part = part.scalars().first()
+
+		for key, value in edit_part.dict(exclude = {"id"}).items():
+			setattr(part, key, value)
+
+		await session.commit()
+
+	return part
 
 
 async def get_comments_db(
