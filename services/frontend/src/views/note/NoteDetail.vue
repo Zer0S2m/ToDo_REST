@@ -45,6 +45,13 @@
 				</button>
 				<button
 					type="button"
+					class="note-detail__btn primary-btn red-green"
+					@click="toCompleteNote"
+				>
+					Complete
+				</button>
+				<button
+					type="button"
 					class="note-detail__btn primary-btn red-btn"
 					@click="toDeleteNote"
 				>
@@ -84,6 +91,7 @@ export default {
 	methods: {
 		...mapActions([
 			"deleteNote",
+			"completeNote",
 			"getNote"
 		]),
 		...mapMutations([
@@ -92,19 +100,31 @@ export default {
 			"setDataEditNote",
 			"setAdditionalDataForm"
 		]),
+		endNote() {
+			this.$router.push({
+				name: "ProjectDetail",
+				params: {
+					slugProject: this.slugProject
+				}
+			});
+		},
 		toDeleteNote() {
 			this.deleteNote({
-				slugProject: this.$route.params.slugProject,
+				slugProject: this.slugProject,
 				idNote: this.note.idNote,
 				idPart: this.note.partId,
 				levelImportance: this.note.importance
 			});
-			this.$router.push({
-				name: "ProjectDetail",
-				params: {
-					slugProject: this.$route.params.slugProject
-				}
+			this.endNote();
+		},
+		toCompleteNote() {
+			this.completeNote({
+				slugProject: this.slugProject,
+				idNote: this.note.idNote,
+				idPart: this.note.partId,
+				levelImportance: this.note.importance
 			});
+			this.endNote();
 		},
 		editNote() {
 			this.setAdditionalDataForm({

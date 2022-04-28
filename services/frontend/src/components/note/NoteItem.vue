@@ -8,18 +8,32 @@
 				<div class="note-area">
 					<div class="note-date df al-it-center just-between w100">
 						<time>{{ getPubDate }}</time>
-						<button
-							type="button"
-							class="note-delete df"
-							@click="deleteNote({
-								slugProject: this.$route.params.slugProject,
-								idNote: note.idNote,
-								idPart: note.partId,
-								levelImportance: note.importance
-							})"
-						>
-							<img src="@/assets/img/delete-note.svg" alt="" class="note-delete-img">
-						</button>
+						<div class="note-date-wrapper df al-it-cen">
+							<button
+								type="button"
+								class="note-complete note-btn df"
+								@click="completeNote({
+									slugProject: this.$route.params.slugProject,
+									idNote: note.idNote,
+									idPart: note.partId,
+									levelImportance: note.importance
+								})"
+							>
+								<img src="@/assets/img/complete.svg" alt="" class="note-complete-img note-btn-img">
+							</button>
+							<button
+								type="button"
+								class="note-delete note-btn df"
+								@click="deleteNote({
+									slugProject: this.$route.params.slugProject,
+									idNote: note.idNote,
+									idPart: note.partId,
+									levelImportance: note.importance
+								})"
+							>
+								<img src="@/assets/img/delete-note.svg" alt="" class="note-delete-img note-btn-img">
+							</button>
+						</div>
 					</div>
 					<h4 class="note-title">{{ note.titleNote }}</h4>
 					<div class="note-text">
@@ -60,7 +74,8 @@ export default {
 	},
 	methods: {
 		...mapActions([
-			"deleteNote"
+			"deleteNote",
+			"completeNote"
 		]),
 	},
 	computed: {

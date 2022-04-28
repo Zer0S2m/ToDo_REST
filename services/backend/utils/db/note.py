@@ -19,6 +19,7 @@ from models import (
 from schemas.user import UserInDB
 from schemas.note import (
 	NoteCreate, NoteDeleted, NoteEdit,
+	NoteComplete
 )
 
 from utils.common import (
@@ -40,6 +41,7 @@ async def get_notes_db(
 			select(Note, Project)
 			.filter_by(user_id = current_user.user_id)
 			.where(
+				Note.active == True,
 				Project.slug == slug_project,
 				Project.id == Note.project_id
 			)
@@ -60,7 +62,10 @@ async def get_note_db(
 	async with Session.begin() as session:
 		note = await session.execute(
 			select(Note)
-			.filter_by(id = note_id, user_id = current_user.user_id)
+			.filter_by(user_id = current_user.user_id)
+			.where(
+				Note.id == note_id, Note.active == True
+			)
 			.options(selectinload(Note.file), selectinload(Note.category))
 		)
 		note = note.scalars().first()
@@ -98,7 +103,7 @@ async def craete_note_db(
 	}
 
 
-async def deleting_note(
+async def delete_note_db(
 	note: NoteDeleted,
 	current_user: UserInDB
 ):
@@ -118,7 +123,25 @@ async def deleting_note(
 		await session.commit()
 
 
-async def editing_note(
+async def complete_note_db(
+	note: NoteComplete,
+	current_user: UserInDB
+):
+	async with Session.begin() as session:
+		completed_note = await session.execute(
+			select(Note)
+			.filter_by(user_id = current_user.user_id)
+			.where(
+				Note.id == note.id
+			)
+		)
+		completed_note = completed_note.scalars().first()
+		completed_note.active = False
+
+		await session.commit()
+
+
+async def edit_note_db(
 	note: NoteEdit,
 	data_file: dict,
 	current_user: UserInDB
@@ -179,7 +202,7 @@ async def get_file(
 	return file
 
 
-async def creating_file_note(
+async def create_file_note_db(
 	file_path: str,
 	file_name: str,
 	current_user: UserInDB
@@ -210,7 +233,7 @@ async def set_file_note(
 		file_path = os.path.join(MEDIA_DIR, file.filename)
 		file_name = file.filename
 
-	file_id = await creating_file_note(file_path, file_name, current_user)
+	file_id = await create_file_note_db(file_path, file_name, current_user)
 	await writing_file(file, file_path)
 
 	return {

@@ -158,7 +158,7 @@
 		opacity: 0.5;
 	}
 
-	&-delete {
+	&-btn {
 		opacity: 0.75;
 		transition: $animate;
 
@@ -169,6 +169,10 @@
 		&-img {
 			width: 14px;
 			height: 14px;
+		}
+
+		&.note-complete {
+			margin-right: 8px;
 		}
 	}
 

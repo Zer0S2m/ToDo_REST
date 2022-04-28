@@ -2,22 +2,22 @@ from typing import List
 
 from fastapi import (
 	APIRouter, HTTPException, UploadFile,
-	Depends, File
+	Depends, File, status
 )
 from fastapi.responses import StreamingResponse
 
 from schemas.user import UserInDB
 from schemas.note import (
 	NoteSchema, NoteDeleted, NoteEdit,
-	NoteCreate,
+	NoteCreate, NoteComplete
 )
 
 from models import Note
 
 from utils.db.note import (
-	get_notes_db, get_note_db, deleting_note,
-	editing_note, craete_note_db, set_file_note,
-	get_file,
+	get_notes_db, get_note_db, delete_note_db,
+	edit_note_db, craete_note_db, set_file_note,
+	get_file, complete_note_db
 )
 from utils.users import get_current_user
 from utils.common import (
@@ -87,7 +87,7 @@ async def delete_note(
 	current_user: UserInDB = Depends(get_current_user)
 ):
 	await check_is_note_in_db(note.id, current_user)
-	await deleting_note(note, current_user)
+	await delete_note_db(note, current_user)
 
 
 @router.put(
@@ -106,16 +106,29 @@ async def edit_note(
 	if file:
 		data_file = await set_file_note(file, current_user)
 
-	note = await editing_note(note, data_file, current_user)
+	note = await edit_note_db(note, data_file, current_user)
 	note_dict = note.as_dict
 	note_dict = set_category_note(note = note)
 
 	return note_dict
 
 
+@router.patch(
+	"/complete"
+)
+async def complete_note(
+	slug_project: str,
+	note: NoteComplete,
+	current_user: UserInDB = Depends(get_current_user)
+):
+	await check_is_note_in_db(note.id, current_user)
+	await complete_note_db(note, current_user)
+
+
 @router.post(
 	"/create",
-	response_model = NoteSchema
+	response_model = NoteSchema,
+	status_code = status.HTTP_201_CREATED
 )
 async def create_note(
 	slug_project: str,

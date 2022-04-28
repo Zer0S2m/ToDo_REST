@@ -66,6 +66,23 @@ export default {
 		}
 	},
 	actions: {
+		endNote(state, data) {
+			const partDetail = state.getters.getPartDetailById(data.idPart);
+			const partInProjectPage = state.getters.getPartDetailInProjectPage(data.idPart);
+
+			state.commit("deleteNote", {
+				partDetail,
+				idNote: data.idNote
+			});
+			state.commit("changeCountAllNotesInProject", {
+				partInProjectPage: partInProjectPage,
+				number: -1
+			})
+			state.commit("reducesCountNotesImportanceLevels", {
+				part: partInProjectPage,
+				levelImportance: data.levelImportance
+			});
+		},
 		deleteNote(state, data) {
 			axios.delete(`/project/${data.slugProject}/note/delete`, {
 				data: {
@@ -73,21 +90,7 @@ export default {
 				}
 			})
 			.then((res) => {
-				const partDetail = state.getters.getPartDetailById(data.idPart);
-				const partInProjectPage = state.getters.getPartDetailInProjectPage(data.idPart);
-
-				state.commit("deleteNote", {
-					partDetail,
-					idNote: data.idNote
-				});
-				state.commit("changeCountAllNotesInProject", {
-					partInProjectPage: partInProjectPage,
-					number: -1
-				})
-				state.commit("reducesCountNotesImportanceLevels", {
-					part: partInProjectPage,
-					levelImportance: data.levelImportance
-				});
+				state.dispatch("endNote", data);
 			})
 			.catch(error => {
 				console.error(error);
@@ -168,6 +171,17 @@ export default {
 				console.error(error);
 			});
 		},
+		completeNote(state, data) {
+			axios.patch(`/project/${data.slugProject}/note/complete`, {
+				idNote: data.idNote
+			})
+				.then((res) => {
+					state.dispatch("endNote", data);
+				})
+				.catch((error) => {
+					console.error(error);
+				});
+		}
 	},
 	getters: {
 		getShowFormNote: state => state.isShowFormNote,
