@@ -156,4 +156,12 @@ body {
 			background-color: darken($color-importance-3, 10%);
 		}
 	}
+
+	&.red-green {
+		background-color: $color-importance-1;
+
+		&:hover {
+			background-color: darken($color-importance-1, 10%);
+		}
+	}
 }
