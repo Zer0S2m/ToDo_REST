@@ -1,6 +1,7 @@
 from sqlalchemy import (
 	Column, Integer, String,
-	DateTime, Text, ForeignKey
+	DateTime, Text, ForeignKey,
+	Boolean
 )
 
 from sqlalchemy.orm import (
@@ -29,6 +30,14 @@ Session = sessionmaker(
 Base = declarative_base()
 
 
+# async def get_session() -> AsyncSession:
+#     async_session = sessionmaker(
+#         engine, class_=AsyncSession, expire_on_commit=False
+#     )
+#     async with async_session() as session:
+#         yield session
+
+
 class Note(Base):
 	__tablename__ = "note"
 
@@ -44,6 +53,7 @@ class Note(Base):
 	category = relationship("Category", back_populates = "notes", lazy = "selectin")
 	part_id = Column(Integer, ForeignKey('part.id', ondelete = "CASCADE"), nullable = False)
 	project_id = Column(Integer, ForeignKey("project.id", ondelete = "CASCADE"), nullable = False)
+	active = Column(Boolean, nullable = False, default = True)
 
 	def __repr__(self) -> str:
 		return f"id: {self.id} - title: {self.title}"

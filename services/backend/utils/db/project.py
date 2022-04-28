@@ -9,7 +9,7 @@ from sqlalchemy.orm import selectinload
 
 from models import (
 	Session, Project, Comment,
-	Part
+	Part, Note
 )
 
 from schemas.user import UserInDB
@@ -58,7 +58,7 @@ async def get_project_db(
 			)
 			.options(
 				selectinload(Project.comments),
-				selectinload(Project.parts).selectinload(Part.notes),
+				selectinload(Project.parts).selectinload(Part.notes.and_(Note.active == True)),
 				selectinload(Project.categories)
 			)
 		)
@@ -145,7 +145,9 @@ async def get_parts_db(
 			.where(
 				Project.slug == slug_category, Part.project_id == Project.id
 			)
-			.options(selectinload(Part.notes))
+			.options(
+				selectinload(Part.notes.and_(Note.active == True))
+			)
 		)
 		parts_db = parts_db.scalars().all()
 
@@ -166,7 +168,9 @@ async def get_part_db(
 					Part.slug == slug_part, Part.project_id == Project.id, Project.slug == slug_project,
 				)
 			)
-			.options(selectinload(Part.notes))
+			.options(
+				selectinload(Part.notes.and_(Note.active == True))
+			)
 		)
 		part = part.scalars().first()
 
