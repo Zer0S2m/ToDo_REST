@@ -27,7 +27,7 @@ from utils.common import (
 	writing_file, check_file_is_storage,
 )
 
-from .category import get_category_db
+from .category import ServiceDBCategory
 
 from config import MEDIA_DIR
 
@@ -76,7 +76,8 @@ async def get_note_db(
 async def craete_note_db(
 	note: NoteCreate,
 	file_id: int,
-	current_user: UserInDB
+	current_user: UserInDB,
+	service_category: ServiceDBCategory
 ) -> Dict[Note, Optional[Category]]:
 	async with Session.begin() as session:
 		category = None
@@ -92,7 +93,7 @@ async def craete_note_db(
 		if file_id:
 			new_note.file_id = file_id
 		if note.category_id:
-			category = await get_category_db(current_user, category_id = note.category_id)
+			category = await service_category.fetch_one(category_id = note.category_id)
 			new_note.category_id = note.category_id
 
 		session.add(new_note)

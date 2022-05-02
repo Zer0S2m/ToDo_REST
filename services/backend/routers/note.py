@@ -14,6 +14,8 @@ from schemas.note import (
 
 from models import Note
 
+from utils.db.category import ServiceDBCategory
+
 from utils.db.note import (
 	get_notes_db, get_note_db, delete_note_db,
 	edit_note_db, craete_note_db, set_file_note,
@@ -134,7 +136,8 @@ async def create_note(
 	slug_project: str,
 	note: NoteCreate = Depends(),
 	file: UploadFile = File(None),
-	current_user: UserInDB = Depends(get_current_user)
+	current_user: UserInDB = Depends(get_current_user),
+	service_category: ServiceDBCategory = Depends()
 ) -> dict:
 	file_id = 0
 	file_name = None
@@ -144,7 +147,9 @@ async def create_note(
 		file_id = data_file["file_id"]
 		file_name = data_file["file_name"]
 
-	data = await craete_note_db(note = note, file_id = file_id, current_user = current_user)
+	data = await craete_note_db(
+		note = note, file_id = file_id, current_user = current_user, service_category = service_category
+	)
 	note_dict = data["new_note"].as_dict
 	note_dict["file_name"] = file_name
 
