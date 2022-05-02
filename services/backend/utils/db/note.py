@@ -1,19 +1,23 @@
 import os
 
 from typing import (
-	Optional, Dict, List
+	Optional, Dict, List,
+	Union
 )
 
 from datetime import datetime
 
-from fastapi import UploadFile
+from fastapi import (
+	UploadFile, Depends
+)
 
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from models import (
 	Note, File, Session,
-	Project, Category
+	Project, Category, get_session
 )
 
 from schemas.user import UserInDB
@@ -26,20 +30,29 @@ from utils.common import (
 	create_unique_name_file, delete_file_storage, check_path_media_dir,
 	writing_file, check_file_is_storage,
 )
+from utils.users import get_current_user
 
 from .category import ServiceDBCategory
 
 from config import MEDIA_DIR
 
 
-async def get_notes_db(
-	current_user: UserInDB,
-	slug_project: str
-) -> List[Note]:
-	async with Session.begin() as session:
-		notes = await session.execute(
+class ServiceDBNote():
+	def __init__(
+		self,
+		session: AsyncSession = Depends(get_session),
+		current_user: UserInDB = Depends(get_current_user)
+	) -> None:
+		self.session = session
+		self.current_user = current_user
+
+	async def fetch_all(
+		self,
+		slug_project: str
+	) -> List[Note]:
+		notes = await self.session.execute(
 			select(Note, Project)
-			.filter_by(user_id = current_user.user_id)
+			.filter_by(user_id = self.current_user.user_id)
 			.where(
 				Note.active == True,
 				Project.slug == slug_project,
@@ -52,17 +65,15 @@ async def get_notes_db(
 		)
 		notes = notes.scalars().all()
 
-	return notes
+		return notes
 
-
-async def get_note_db(
-	note_id: int,
-	current_user: UserInDB
-) -> Note:
-	async with Session.begin() as session:
-		note = await session.execute(
+	async def fetch_one(
+		self,
+		note_id: int
+	) -> Note:
+		note = await self.session.execute(
 			select(Note)
-			.filter_by(user_id = current_user.user_id)
+			.filter_by(user_id = self.current_user.user_id)
 			.where(
 				Note.id == note_id, Note.active == True
 			)
@@ -70,22 +81,20 @@ async def get_note_db(
 		)
 		note = note.scalars().first()
 
-	return note
+		return note
 
-
-async def craete_note_db(
-	note: NoteCreate,
-	file_id: int,
-	current_user: UserInDB,
-	service_category: ServiceDBCategory
-) -> Dict[Note, Optional[Category]]:
-	async with Session.begin() as session:
+	async def create(
+		self,
+		note: NoteCreate,
+		file_id: int,
+		service_category: ServiceDBCategory
+	) -> Dict[str, Union[Optional[Category], Note]]:
 		category = None
 		new_note = Note(
 			title = note.title,
 			text = note.text,
 			pub_date = datetime.now(),
-			user_id = current_user.user_id,
+			user_id = self.current_user.user_id,
 			importance = note.importance,
 			part_id = note.part_id,
 			project_id = note.project_id,
@@ -96,22 +105,21 @@ async def craete_note_db(
 			category = await service_category.fetch_one(category_id = note.category_id)
 			new_note.category_id = note.category_id
 
-		session.add(new_note)
+		self.session.add(new_note)
+		await self.session.commit()
 
-	return {
-		"new_note": new_note,
-		"category": category
-	}
+		return {
+			"new_note": new_note,
+			"category": category
+		}
 
-
-async def delete_note_db(
-	note: NoteDeleted,
-	current_user: UserInDB
-):
-	async with Session() as session:
-		result = await session.execute(
+	async def delete(
+		self,
+		note: NoteDeleted,
+	) -> None:
+		result = await self.session.execute(
 			select(Note)
-			.filter_by(id = note.id, user_id = current_user.user_id)
+			.filter_by(id = note.id, user_id = self.current_user.user_id)
 			.options(selectinload(Note.file))
 		)
 		deleted_note = result.scalars().first()
@@ -120,18 +128,16 @@ async def delete_note_db(
 			file_name = deleted_note.file.file_name
 			await delete_file_storage(file_name)
 
-		await session.delete(deleted_note)
-		await session.commit()
+		await self.session.delete(deleted_note)
+		await self.session.commit()
 
-
-async def complete_note_db(
-	note: NoteComplete,
-	current_user: UserInDB
-):
-	async with Session.begin() as session:
-		completed_note = await session.execute(
+	async def complete(
+		self,
+		note: NoteComplete
+	) -> None:
+		completed_note = await self.session.execute(
 			select(Note)
-			.filter_by(user_id = current_user.user_id)
+			.filter_by(user_id = self.current_user.user_id)
 			.where(
 				Note.id == note.id
 			)
@@ -139,18 +145,16 @@ async def complete_note_db(
 		completed_note = completed_note.scalars().first()
 		completed_note.active = False
 
-		await session.commit()
+		await self.session.commit()
 
-
-async def edit_note_db(
-	note: NoteEdit,
-	data_file: dict,
-	current_user: UserInDB
-) -> Note:
-	async with Session() as session:
-		note_edit = await session.execute(
+	async def edit(
+		self,
+		note: NoteEdit,
+		data_file: dict,
+	) -> Note:
+		note_edit = await self.session.execute(
 			select(Note)
-			.filter_by(id = note.id, user_id = current_user.user_id)
+			.filter_by(id = note.id, user_id = self.current_user.user_id)
 		)
 		note_edit = note_edit.scalars().first()
 
@@ -161,7 +165,7 @@ async def edit_note_db(
 
 		if data_file:
 			await delete_file_storage(note.file_name)
-			await deleting_file_db(session, note.file_name)
+			await deleting_file_db(self.session, note.file_name)
 
 			note_edit.file_id = data_file["file_id"]
 			note.file_name = data_file["file_name"]
@@ -171,10 +175,10 @@ async def edit_note_db(
 		note_edit.text = note.text
 		note.pub_date = note_edit.pub_date
 
-		await session.commit()
-		await session.refresh(note_edit)
+		await self.session.commit()
+		await self.session.refresh(note_edit)
 
-	return note_edit
+		return note_edit
 
 
 async def deleting_file_db(
