@@ -20,11 +20,10 @@ from schemas.project.comment import (
 
 from utils.users import get_current_user
 from utils.db.project import (
-	create_project_db, get_projects_db, get_project_db,
-	delete_project_db, create_part_db, get_parts_db,
-	get_part_db, delete_part_db, get_comments_db,
-	delete_comment_db, create_comment_db, edit_comment_db,
-	get_project_db_for_check, edit_part_db, edit_project_db
+	ServiceDBProject, ServiceDBPart, ServiceDBComment
+)
+from utils.db.project import (
+	get_project_db_for_check
 )
 from utils.common import (
 	set_category_note, set_file_name_note, set_count_notes_importance_levels,
@@ -35,7 +34,7 @@ from utils.slug import (
 )
 
 from models import (
-	Part, Project
+	Part, Project, Comment
 )
 
 
@@ -47,11 +46,11 @@ router = APIRouter(
 
 
 async def check_is_part_in_db(
-	current_user: UserInDB,
 	slug_part: str,
-	slug_project: str
+	slug_project: str,
+	service: ServiceDBPart = Depends()
 ) -> Part:
-	part_db = await get_part_db(slug_project, slug_part, current_user)
+	part_db = await service.fetch_one(slug_project, slug_part)
 	if not part_db:
 		raise HTTPException(status_code = 404, detail = "Part not found")
 	return part_db
@@ -62,19 +61,10 @@ async def check_is_part_in_db(
 	response_model = List[ProjectMain]
 )
 async def get_projects(
-	current_user: UserInDB = Depends(get_current_user),
+	service: ServiceDBProject = Depends()
 ) -> List[dict]:
-	projects = []
-
-	projects_db = await get_projects_db(current_user)
-	for project in projects_db:
-		parts = [part.serialize_project_main for part in project.parts]
-		dict_project = project.as_dict
-		dict_project.update({
-			"parts": parts, "comments": project.comments, "categories": project.categories
-		})
-		projects.append(dict_project)
-
+	projects_db = await service.fetch_all()
+	projects = [project.__call__() for project in projects_db]
 	return projects
 
 
@@ -84,14 +74,15 @@ async def get_projects(
 )
 async def create_project(
 	project: ProjectCreate,
-	current_user: UserInDB = Depends(get_current_user)
-):
+	current_user: UserInDB = Depends(get_current_user),
+	service: ServiceDBProject = Depends()
+) -> dict:
 	slug_project = create_slug_project(project.slug, current_user.user_id)
 	is_project = await get_project_db_for_check(slug_project, current_user)
 	if is_project:
 		raise HTTPException(status_code = 400, detail = "Project already exists")
 
-	new_project = await create_project_db(project, current_user)
+	new_project = await service.create(project)
 	new_project = new_project.as_dict
 	new_project.update({"parts": [], "comments": [], "categories": []})
 	return new_project
@@ -100,9 +91,9 @@ async def create_project(
 @router.delete("/delete")
 async def delete_project(
 	project: ProjectDeleted,
-	current_user: UserInDB = Depends(get_current_user)
+	service: ServiceDBProject = Depends(),
 ):
-	await delete_project_db(project, current_user)
+	await service.delete(project)
 
 
 @router.put(
@@ -111,9 +102,9 @@ async def delete_project(
 )
 async def edit_project(
 	part: ProjectEdit,
-	current_user: UserInDB = Depends(get_current_user),
+	service: ServiceDBProject = Depends()
 ) -> Project:
-	project_db = await edit_project_db(part, current_user)
+	project_db = await service.edit(part)
 	return project_db
 
 
@@ -123,9 +114,9 @@ async def edit_project(
 )
 async def get_project(
 	slug_project: str,
-	current_user: UserInDB = Depends(get_current_user)
+	service: ServiceDBProject = Depends()
 ) -> dict:
-	project_db = await get_project_db(slug_project, current_user)
+	project_db = await service.fetch_one(slug_project)
 	if not project_db:
 		raise HTTPException(status_code = 404, detail = "Project not found")
 
@@ -156,9 +147,9 @@ async def get_project(
 )
 async def get_parts(
 	slug_project: str,
-	current_user: UserInDB = Depends(get_current_user),
-):
-	parts_db = await get_parts_db(slug_project, current_user)
+	service: ServiceDBPart = Depends()
+) -> List[dict]:
+	parts_db = await service.fetch_all(slug_project)
 	parts = []
 
 	for part in parts_db:
@@ -177,12 +168,8 @@ async def get_parts(
 	dependencies = [Depends(check_is_project_in_db)]
 )
 async def get_part(
-	slug_project: str,
-	slug_part: str,
-	current_user: UserInDB = Depends(get_current_user)
+	part_db: Part = Depends(check_is_part_in_db)
 ) -> dict:
-	part_db = await check_is_part_in_db(current_user, slug_part, slug_project)
-
 	part = part_db.as_dict
 	notes = []
 
@@ -205,9 +192,10 @@ async def get_part(
 async def create_part(
 	part: PartCreate,
 	slug_project: str,
-	current_user: UserInDB = Depends(get_current_user)
+	service: ServiceDBPart = Depends()
 ):
-	new_part = await create_part_db(part, current_user)
+	new_part = await service.create(part)
+
 	part = new_part.as_dict
 	part.update({
 		"notes": [],
@@ -226,9 +214,9 @@ async def create_part(
 async def delete_part(
 	part: PartDeleted,
 	slug_project: str,
-	current_user: UserInDB = Depends(get_current_user)
+	service: ServiceDBPart = Depends()
 ):
-	await delete_part_db(part, current_user)
+	await service.delete(part)
 
 
 @router.put(
@@ -240,9 +228,9 @@ async def delete_part(
 async def edit_part(
 	slug_project: str,
 	part: PartEdit,
-	current_user: UserInDB = Depends(get_current_user),
+	service: ServiceDBPart = Depends()
 ) -> Part:
-	part_db = await edit_part_db(part, current_user)
+	part_db = await service.edit(part)
 	return part_db
 
 
@@ -254,9 +242,9 @@ async def edit_part(
 )
 async def get_comments(
 	slug_project: str,
-	current_user: UserInDB = Depends(get_current_user)
-):
-	comments = await get_comments_db(slug_project, current_user)
+	service: ServiceDBComment = Depends()
+) -> List[Comment]:
+	comments = await service.fetch_all(slug_project)
 	return comments
 
 
@@ -269,9 +257,9 @@ async def get_comments(
 async def create_comment(
 	slug_project: str,
 	comment: CommentCreate,
-	current_user: UserInDB = Depends(get_current_user)
-):
-	new_comment = await create_comment_db(comment, current_user)
+	service: ServiceDBComment = Depends()
+) -> Comment:
+	new_comment = await service.create(comment)
 	return new_comment
 
 
@@ -284,9 +272,9 @@ async def create_comment(
 async def edit_comment(
 	slug_project: str,
 	comment: CommentEdit,
-	current_user: UserInDB = Depends(get_current_user)
+	service: ServiceDBComment = Depends()
 ):
-	editing_comment = await edit_comment_db(comment, current_user)
+	editing_comment = await service.edit(comment)
 	return editing_comment
 
 
@@ -298,6 +286,6 @@ async def edit_comment(
 async def delete_comment(
 	slug_project: str,
 	comment: CommentDeleted,
-	current_user: UserInDB = Depends(get_current_user)
+	service: ServiceDBComment = Depends()
 ):
-	await delete_comment_db(comment, current_user)
+	await service.delete(comment)

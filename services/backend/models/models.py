@@ -1,3 +1,7 @@
+from contextlib import asynccontextmanager
+
+from typing import List
+
 from sqlalchemy import (
 	Column, Integer, String,
 	DateTime, Text, ForeignKey,
@@ -30,12 +34,14 @@ Session = sessionmaker(
 Base = declarative_base()
 
 
-# async def get_session() -> AsyncSession:
-#     async_session = sessionmaker(
-#         engine, class_=AsyncSession, expire_on_commit=False
-#     )
-#     async with async_session() as session:
-#         yield session
+async def get_session() -> AsyncSession:
+    async with Session() as session:
+        yield session
+
+@asynccontextmanager
+async def get_session_async() -> AsyncSession:
+    async with Session() as session:
+        yield session
 
 
 class Note(Base):
@@ -141,9 +147,22 @@ class Project(Base):
 	def __repr__(self) -> str:
 		return f"id: {self.id} - title: {self.title}"
 
+	def __call__(self) -> dict:
+		dict_project = self.as_dict
+		dict_project.update({
+			"parts": self.get_parts,
+			"comments": self.comments,
+			"categories": self.categories
+		})
+		return dict_project
+
 	@property
 	def as_dict(self):
 		return {_cls.name: getattr(self, _cls.name) for _cls in self.__table__.columns}
+
+	@property
+	def get_parts(self) -> List[dict]:
+		return [part.serialize_project_main for part in self.parts]
 
 
 class Comment(Base):
