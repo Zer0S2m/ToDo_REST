@@ -1,6 +1,8 @@
 from contextlib import asynccontextmanager
 
-from typing import List
+from typing import (
+	List, Dict
+)
 
 from sqlalchemy import (
 	Column, Integer, String,
@@ -65,7 +67,7 @@ class Note(Base):
 		return f"id: {self.id} - title: {self.title}"
 
 	@property
-	def as_dict(self):
+	def as_dict(self) -> dict:
 		return {_cls.name: getattr(self, _cls.name) for _cls in self.__table__.columns}
 
 
@@ -81,7 +83,7 @@ class File(Base):
 		return f"id: {self.id} - title: {self.file_name}"
 
 	@property
-	def as_dict(self):
+	def as_dict(self) -> dict:
 		return {_cls.name: getattr(self, _cls.name) for _cls in self.__table__.columns}
 
 
@@ -99,7 +101,7 @@ class Category(Base):
 		return f"title: {self.title} - slug: {self.slug}"
 
 	@property
-	def as_dict(self):
+	def as_dict(self) -> dict:
 		return {_cls.name: getattr(self, _cls.name) for _cls in self.__table__.columns}
 
 
@@ -121,7 +123,7 @@ class User(Base):
 		return f"id: {self.id} - username: {self.username}"
 
 	@property
-	def as_dict(self):
+	def as_dict(self) -> dict:
 		return {_cls.name: getattr(self, _cls.name) for _cls in self.__table__.columns}
 
 
@@ -157,7 +159,7 @@ class Project(Base):
 		return dict_project
 
 	@property
-	def as_dict(self):
+	def as_dict(self) -> dict:
 		return {_cls.name: getattr(self, _cls.name) for _cls in self.__table__.columns}
 
 	@property
@@ -178,7 +180,7 @@ class Comment(Base):
 		return f"id: {self.id}"
 
 	@property
-	def as_dict(self):
+	def as_dict(self) -> dict:
 		return {_cls.name: getattr(self, _cls.name) for _cls in self.__table__.columns}
 
 
@@ -203,13 +205,36 @@ class Part(Base):
 		return f"id: {self.id} - title: {self.title}"
 
 	@property
-	def as_dict(self):
+	def as_dict(self) -> dict:
 		return {_cls.name: getattr(self, _cls.name) for _cls in self.__table__.columns}
 
 	@property
-	def serialize_project_main(self):
+	def serialize_project_main(self) -> dict:
 		return {
 			"title": self.title,
 			"slug": self.slug,
 			"id": self.id
 		}
+
+	@property
+	def serialize_project_detail(self):
+		return {
+			"count_notes": len(self.notes),
+			"count_notes_importance_levels": set_count_notes_importance_levels(self.notes)
+		}
+
+
+def set_count_notes_importance_levels(
+	notes: List[Note]
+) -> Dict[int, int]:
+	count_levels = {
+		0: 0,
+		1: 0,
+		2: 0,
+		3: 0,
+	}
+
+	for note in notes:
+		count_levels[note.importance] += 1
+
+	return count_levels

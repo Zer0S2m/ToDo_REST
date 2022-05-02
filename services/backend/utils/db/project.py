@@ -204,6 +204,7 @@ class ServiceDBPart():
 		)
 		self.session.add(new_part)
 		await self.session.commit()
+		await self.session.refresh(new_part)
 
 		return new_part
 

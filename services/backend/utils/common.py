@@ -89,22 +89,6 @@ def set_file_name_note(
 	return note_dict
 
 
-def set_count_notes_importance_levels(
-	notes: List[Note]
-) -> Dict[int, int]:
-	count_levels = {
-		0: 0,
-		1: 0,
-		2: 0,
-		3: 0,
-	}
-
-	for note in notes:
-		count_levels[note.importance] += 1
-
-	return count_levels
-
-
 async def check_is_project_in_db(
 	request: Request,
 	current_user: UserInDB = Depends(get_current_user)

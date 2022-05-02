@@ -26,15 +26,15 @@ from utils.db.project import (
 	get_project_db_for_check
 )
 from utils.common import (
-	set_category_note, set_file_name_note, set_count_notes_importance_levels,
-	check_is_project_in_db,
+	set_category_note, set_file_name_note, check_is_project_in_db
 )
 from utils.slug import (
 	create_slug_project
 )
 
 from models import (
-	Part, Project, Comment
+	Part, Project, Comment,
+	set_count_notes_importance_levels
 )
 
 
@@ -124,10 +124,7 @@ async def get_project(
 	parts = []
 	for part in project_db.parts:
 		part_dict = part.as_dict
-		part_dict.update({
-			"count_notes": len(part.notes),
-			"count_notes_importance_levels": set_count_notes_importance_levels(part.notes)
-		})
+		part_dict.update(part.serialize_project_detail)
 		parts.append(part_dict)
 
 	project.update({
@@ -154,8 +151,7 @@ async def get_parts(
 
 	for part in parts_db:
 		part_dict = part.as_dict
-		part_dict.update({"count_notes": len(part.notes)})
-		part_dict.update({"count_notes_importance_levels": set_count_notes_importance_levels(part.notes)})
+		part_dict.update(part.serialize_project_detail)
 		parts.append(part_dict)
 
 	return parts
