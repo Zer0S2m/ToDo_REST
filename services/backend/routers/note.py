@@ -33,6 +33,14 @@ router = APIRouter(
 )
 
 
+def set_params_note(
+	note: Note
+) -> dict:
+	note_dict = set_category_note(note = note)
+	note_dict = set_file_name_note(note = note, note_dict = note_dict)
+	return note_dict
+
+
 async def check_is_note_in_db(
 	note_id: int,
 	service: ServiceDBNote
@@ -52,14 +60,8 @@ async def get_notes(
 	slug_project: str,
 	service: ServiceDBNote = Depends()
 ) -> List[dict]:
-	notes = []
-
 	notes_db = await service.fetch_all(slug_project)
-	for note in notes_db:
-		note_dict = set_category_note(note = note)
-		note_dict = set_file_name_note(note = note, note_dict = note_dict)
-		notes.append(note_dict)
-
+	notes = [set_params_note(note) for note in notes_db]
 	return notes
 
 
@@ -74,10 +76,22 @@ async def get_note(
 	service: ServiceDBNote = Depends()
 ) -> dict:
 	note = await check_is_note_in_db(note_id, service)
-	note_dict = set_category_note(note = note)
-	note_dict = set_file_name_note(note = note, note_dict = note_dict)
-
+	note_dict = set_params_note(note)
 	return note_dict
+
+
+@router.get(
+	"/{slug_part:str}/completed",
+	response_model = List[NoteSchema],
+)
+async def get_completed_notes(
+	slug_project: str,
+	slug_part: str,
+	service: ServiceDBNote = Depends(),
+) -> List[dict]:
+	notes_db = await service.fetch_all(slug_project, active = False, slug_part = slug_part)
+	notes = [set_params_note(note) for note in notes_db]
+	return notes
 
 
 @router.delete("/delete")

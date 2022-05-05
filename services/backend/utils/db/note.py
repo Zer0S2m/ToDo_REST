@@ -17,7 +17,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from models import (
 	Note, File, Session,
-	Project, Category, get_session
+	Project, Category, get_session,
+	Part
 )
 
 from schemas.user import UserInDB
@@ -48,15 +49,19 @@ class ServiceDBNote():
 
 	async def fetch_all(
 		self,
-		slug_project: str
+		slug_project: str,
+		active: bool = True,
+		slug_part: str = None
 	) -> List[Note]:
 		notes = await self.session.execute(
-			select(Note, Project)
+			select(Note, Project, Part)
 			.filter_by(user_id = self.current_user.user_id)
 			.where(
-				Note.active == True,
+				Note.active == active,
 				Project.slug == slug_project,
-				Project.id == Note.project_id
+				Project.id == Note.project_id,
+				Part.slug == slug_part,
+				Part.id == Note.part_id
 			)
 			.order_by(Note.pub_date.desc())
 			.options(
@@ -75,7 +80,7 @@ class ServiceDBNote():
 			select(Note)
 			.filter_by(user_id = self.current_user.user_id)
 			.where(
-				Note.id == note_id, Note.active == True
+				Note.id == note_id
 			)
 			.options(selectinload(Note.file), selectinload(Note.category))
 		)

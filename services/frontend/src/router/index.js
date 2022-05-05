@@ -9,6 +9,8 @@ const ListProject = () => import("@/views/project/ListProject");
 const ProjectDetail = () => import("@/views/project/ProjectDetail");
 const PageProject = () => import("@/views/project/PageProject");
 const PartDetail = () => import("@/views/project/PartDetail");
+const PartClosedNotes = () => import("@/views/project/childrenPart/ClosedNotes");
+const PartOpenNotes = () => import("@/views/project/childrenPart/OpenNotes");
 
 import store from "@/store"
 import {
@@ -48,25 +50,38 @@ const routes = [
 				path: ":slugProject/part/:slugPart",
 				name: "PartDetail",
 				component: PartDetail,
-				props: true
+				props: true,
+				redirect: to => {
+					return {
+						name: "PartOpenNotes"
+					};
+				},
+				children: [
+					{
+						path: "",
+						name: "PartOpenNotes",
+						component: PartOpenNotes,
+						props: true
+					},
+					{
+						path: "completed",
+						name: "PartClosedNotes",
+						component: PartClosedNotes,
+						props: true
+					},
+				]
 			},
 			{
 				path: ':slugProject/note/:idNote',
 				name: 'NoteDetail',
 				component: NoteDetail,
 				props: true,
-				meta: {
-					requiresAuth: true
-				}
 			},
 			{
 				path: ":slugProject/category/:slugCategory",
 				name: "CategoryDetail",
 				component: CategoryDetail,
 				props: true,
-				meta: {
-					requiresAuth: true
-				}
 			},
 		]
 	},
