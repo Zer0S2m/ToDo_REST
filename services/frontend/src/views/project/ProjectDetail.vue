@@ -116,8 +116,8 @@ export default {
 		const project = this.getProjectDetail(this.slugProject);
 
 		if ( !Boolean(project) ) {
-			await this.getDetailProject(this.slugProject).
-				then((res) => {
+			await this.getDetailProject(this.slugProject)
+				.then((res) => {
 					this.project = res;
 				});
 		} else {

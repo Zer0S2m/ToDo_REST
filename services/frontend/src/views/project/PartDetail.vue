@@ -2,11 +2,38 @@
 	<AppLoader v-if="isUiLocked" />
 	<div class="container part" v-if="!isUiLocked">
 		<h2 class="part__title">Part - {{ part.title }}</h2>
-		<div class="df just-between">
-			<NoteItems :levelImportance=0 titleLevel="Usual" :idPart=part.id />
-			<NoteItems :levelImportance=1 titleLevel="Easy" :idPart=part.id />
-			<NoteItems :levelImportance=2 titleLevel="Important" :idPart=part.id />
-			<NoteItems :levelImportance=3 titleLevel="Urgently" :idPart=part.id />
+		<div class="part__wrapper df al-it-center">
+			<h4 class="part__title-note">
+				<router-link
+					class="part__title-note-link df"
+					:to='{
+						name: "PartDetail",
+						params: {
+							slugProject: slugProject,
+							slugPart: slugPart
+						}
+					}'
+				>
+					<span>{{ getCountNotes }}</span> Open
+				</router-link>
+			</h4>
+			<h4 class="part__title-note">
+				<router-link
+					class="part__title-note-link df"
+					:to='{
+						name: "PartClosedNotes",
+						params: {
+							slugProject: slugProject,
+							slugPart: slugPart
+						}
+					}'
+				>
+					Closed
+				</router-link>
+			</h4>
+		</div>
+		<div>
+			<router-view />
 		</div>
 	</div>
 </template>
@@ -18,7 +45,6 @@ import {
 } from "vuex";
 
 import AppLoader from "@/components/AppLoader";
-import NoteItems from "@/components/note/NoteItems.vue";
 
 
 export default {
@@ -30,11 +56,10 @@ export default {
 	},
 	props: {
 		slugProject: String,
-		slugPart: String,
+		slugPart: String
 	},
 	components: {
-		AppLoader,
-		NoteItems
+		AppLoader
 	},
 	methods: {
 		...mapActions([
@@ -47,7 +72,10 @@ export default {
 			"getPartDetailBySlug",
 			"getPartsDetail",
 			"getProjectDetail",
-		])
+		]),
+		getCountNotes() {
+			if ( this.part.notes ) return this.part.notes.length;
+		},
 	},
 	async created() {
 		const part = this.getPartDetailBySlug(this.slugPart);

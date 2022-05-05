@@ -101,7 +101,6 @@ export default {
 				.then((res) => {
 					const notes = res.data;
 					state.commit("addNotesInProject", { project, notes });
-					console.log(notes);
 				})
 				.catch((error) => {
 					console.error(error);
@@ -121,6 +120,19 @@ export default {
 
 			state.commit("unlockUi");
 			return resNote;
+		},
+		async getCompletedNotes(state, { slugProject, slugPart }) {
+			let notes;
+
+			await axios.get(`/project/${slugProject}/note/${slugPart}/completed`)
+			.then((res) => {
+				notes = res.data;
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+
+			return notes
 		},
 		createNote(state, data) {
 			const dataFile = new FormData();

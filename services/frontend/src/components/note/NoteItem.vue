@@ -8,7 +8,7 @@
 				<div class="note-area">
 					<div class="note-date df al-it-center just-between w100">
 						<time>{{ getPubDate }}</time>
-						<div class="note-date-wrapper df al-it-cen">
+						<div class="note-date-wrapper df al-it-cen" v-if="isTakeAction">
 							<button
 								type="button"
 								class="note-complete note-btn df"
@@ -71,6 +71,7 @@ export default {
 	name: "NoteItem",
 	props: {
 		note: Object,
+		isTakeAction: Boolean
 	},
 	methods: {
 		...mapActions([

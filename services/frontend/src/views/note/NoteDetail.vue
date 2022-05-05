@@ -40,6 +40,7 @@
 					type="button"
 					class="note-detail__btn primary-btn"
 					@click="editNote"
+					v-if="note.active"
 				>
 					Edit
 				</button>
@@ -47,6 +48,7 @@
 					type="button"
 					class="note-detail__btn primary-btn red-green"
 					@click="toCompleteNote"
+					v-if="note.active"
 				>
 					Complete
 				</button>

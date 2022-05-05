@@ -9,7 +9,7 @@
 			class="add-notes-area df al-it-center just-between"
 			:class="classAreaAddNote"
 		>
-			<h6 class="add-notes-title">{{ titleLevel }}</h6>
+			<h6 class="add-notes-title">{{ titleLevel }} <span>({{ getNotesPart.length }})</span></h6>
 			<button
 				type="button"
 				class="add-notes-btn df"
@@ -24,6 +24,7 @@
 			<NoteItem
 				v-for="note in getNotesPart" :key="note.id"
 				:note="note"
+				:isTakeAction='true'
 				@dragstart="onDragStart($event, note)"
 				draggable="true"
 			>
@@ -47,11 +48,12 @@ export default {
 	props: {
 		levelImportance: Number,
 		titleLevel: String,
-		idPart: Number
+		slugPart: String
 	},
 	data() {
 		return {
 			classAreaAddNote: `add-notes-area-${this.levelImportance}`,
+			idPart: null
 		}
 	},
 	components: {
@@ -78,7 +80,7 @@ export default {
 			const idNote = parseInt(event.dataTransfer.getData("idNote"));
 			const idPart = parseInt(event.dataTransfer.getData("idPart"));
 
-			const part = this.getPartDetailById(idPart);
+			const part = this.getPartDetailBySlug(this.slugPart);
 			const currentNote = part.notes.find(note => note.idNote === idNote);
 
 			if ( currentNote.importance !== levelImportance ) {
@@ -89,7 +91,7 @@ export default {
 					idProject: currentNote.projectId
 				});
 				this.editNote({
-					slugPart: this.$route.params.slugPart,
+					slugPart: this.slugPart,
 					slugProject: this.$route.params.slugProject,
 					...currentNote,
 					importance: levelImportance,
@@ -104,7 +106,7 @@ export default {
 		openFormNote() {
 			this.setAdditionalDataForm({
 				slugProject: this.$route.params.slugProject,
-				slugPart: this.$route.params.slugPart,
+				slugPart: this.slugPart,
 				idPart: this.idPart
 			});
 			this.setActionForFormNote("create");
@@ -117,12 +119,12 @@ export default {
 	computed: {
 		...mapGetters([
 			"getFilteredNotesByImportanceLevel",
-			"getPartDetailBySlug",
-			"getPartDetailById"
+			"getPartDetailBySlug"
 		]),
 		getNotesPart() {
-			const part = this.getPartDetailBySlug(this.$route.params.slugPart);
+			const part = this.getPartDetailBySlug(this.slugPart);
 			const notes = this.getFilteredNotesByImportanceLevel(part.notes, this.levelImportance);
+			this.idPart = part.id;
 
 			return notes;
 		}
